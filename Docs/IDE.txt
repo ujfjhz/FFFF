@@ -1,0 +1,11 @@
+1) Editor
+   scite-mql-1.4.2
+
+2) compiler
+   scite-mql-1.4.2 didn't support the new MT4(600+), and you can
+   download the "MQL4/MQL5 Compiler" seperately from the MT4 package
+
+3) config
+   (i)  start scite
+   (ii) Open Options->mql.properties
+   (iii)set metalang to the path of the compiler and following variables like "command.compile",etc
