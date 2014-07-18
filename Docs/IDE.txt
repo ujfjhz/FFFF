@@ -9,3 +9,17 @@
    (i)  start scite
    (ii) Open Options->mql.properties
    (iii)set metalang to the path of the compiler and following variables like "command.compile",etc
+
+
+The following is ok£º
+compiler=$(SciteDefaultHome)\other\compile.bat
+metalang=$(SciteDefaultHome)\..\mql.exe
+command.go.$(file.patterns.mql)="$(compiler)" "$(FilePath)" "$(SciteDefaultHome)" $(1) $(2) $(3) $(4)
+command.go.subsystem.$(file.patterns.mql)=0
+command.compile.$(file.patterns.mql)=$(metalang) "$(FilePath)"
+command.compile.filter.$(file.patterns.mql)=1
+command.build.$(file.patterns.mql)=$(metalang) "$(FilePath)"
+command.build.filter.$(file.patterns.mql)=1
+
+command.help.$(file.patterns.mql)=$(CurrentWord)!$(SciteDefaultHome)\docs\mql.chm
+command.help.subsystem.$(file.patterns.mql)=4
