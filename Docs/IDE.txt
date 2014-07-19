@@ -13,7 +13,7 @@
 
 The following is ok£º
 compiler=$(SciteDefaultHome)\other\compile.bat
-metalang=$(SciteDefaultHome)\..\mql.exe
+metalang=$(SciteDefaultHome)\..\mqlcompiler.exe
 command.go.$(file.patterns.mql)="$(compiler)" "$(FilePath)" "$(SciteDefaultHome)" $(1) $(2) $(3) $(4)
 command.go.subsystem.$(file.patterns.mql)=0
 command.compile.$(file.patterns.mql)=$(metalang) "$(FilePath)"
