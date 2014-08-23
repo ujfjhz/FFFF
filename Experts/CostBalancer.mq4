@@ -10,7 +10,7 @@
 #include <CBFundsManager.mqh>
 #include <CBAnalyst.mqh>
 #include <CBMessage.mqh>
-#include <CBTrade.mqh>
+#include <CBTradeMomentum.mqh>
 #include <CBMonitor.mqh>
 
 bool isTrade=true;//全局控制是否在tick来临时自动化交易
@@ -52,6 +52,7 @@ int init()
    if(sumcode!=7667)
    {
       isTrade=false;
+	  
       log_err("auth false");
    }
 
@@ -121,9 +122,9 @@ int start()
    //get some data
    processMessage();
    
-   if(stratedy=="inertia"){
+   if(stratedy=="momentum"){
    //以惯性策略交易
-      tradeInertia();
+      tradeMomentum();
    }else if(stratedy=="cutail"){
    //以cutail策略(收割尾巴)交易
       tradeCutail();
