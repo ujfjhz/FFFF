@@ -89,7 +89,8 @@ void OnTick(void)
 //--- it is important to enter the market correctly, but it is more important to exit it correctly...   
    for(cnt=0;cnt<total;cnt++)
      {
-      OrderSelect(cnt,SELECT_BY_POS,MODE_TRADES);
+      if(!OrderSelect(cnt,SELECT_BY_POS,MODE_TRADES))
+         continue;
       if(OrderType()<=OP_SELL &&   // check for opened position 
          OrderSymbol()==Symbol())  // check for symbol
         {
@@ -101,7 +102,8 @@ void OnTick(void)
                MacdCurrent>(MACDCloseLevel*Point))
               {
                //--- close order and exit
-               OrderClose(OrderTicket(),OrderLots(),Bid,3,Violet);
+               if(!OrderClose(OrderTicket(),OrderLots(),Bid,3,Violet))
+                  Print("OrderClose error ",GetLastError());
                return;
               }
             //--- check for trailing stop
@@ -112,7 +114,8 @@ void OnTick(void)
                   if(OrderStopLoss()<Bid-Point*TrailingStop)
                     {
                      //--- modify order and exit
-                     OrderModify(OrderTicket(),OrderOpenPrice(),Bid-Point*TrailingStop,OrderTakeProfit(),0,Green);
+                     if(!OrderModify(OrderTicket(),OrderOpenPrice(),Bid-Point*TrailingStop,OrderTakeProfit(),0,Green))
+                        Print("OrderModify error ",GetLastError());
                      return;
                     }
                  }
@@ -125,7 +128,8 @@ void OnTick(void)
                MacdPrevious<SignalPrevious && MathAbs(MacdCurrent)>(MACDCloseLevel*Point))
               {
                //--- close order and exit
-               OrderClose(OrderTicket(),OrderLots(),Ask,3,Violet);
+               if(!OrderClose(OrderTicket(),OrderLots(),Ask,3,Violet))
+                  Print("OrderClose error ",GetLastError());
                return;
               }
             //--- check for trailing stop
@@ -136,7 +140,8 @@ void OnTick(void)
                   if((OrderStopLoss()>(Ask+Point*TrailingStop)) || (OrderStopLoss()==0))
                     {
                      //--- modify order and exit
-                     OrderModify(OrderTicket(),OrderOpenPrice(),Ask+Point*TrailingStop,OrderTakeProfit(),0,Red);
+                     if(!OrderModify(OrderTicket(),OrderOpenPrice(),Ask+Point*TrailingStop,OrderTakeProfit(),0,Red))
+                        Print("OrderModify error ",GetLastError());
                      return;
                     }
                  }

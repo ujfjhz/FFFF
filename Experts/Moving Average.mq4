@@ -110,13 +110,20 @@ void CheckForClose()
       //--- check order type 
       if(OrderType()==OP_BUY)
         {
-         if(Open[1]>ma && Close[1]<ma) OrderClose(OrderTicket(),OrderLots(),Bid,3,White);
+         if(Open[1]>ma && Close[1]<ma)
+           {
+            if(!OrderClose(OrderTicket(),OrderLots(),Bid,3,White))
+               Print("OrderClose error ",GetLastError());
+           }
          break;
         }
       if(OrderType()==OP_SELL)
         {
          if(Open[1]<ma && Close[1]>ma)
-            OrderClose(OrderTicket(),OrderLots(),Ask,3,White);
+           {
+            if(!OrderClose(OrderTicket(),OrderLots(),Ask,3,White))
+               Print("OrderClose error ",GetLastError());
+           }
          break;
         }
      }
