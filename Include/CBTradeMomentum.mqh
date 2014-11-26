@@ -14,9 +14,9 @@ void tradeMomentum()
 
    int posLiveTime = getPosLiveTime();//该货币对已有仓位的存在时间，0表示无仓位
    if(posLiveTime>0){
-      if(posLiveTime>(3600)){//每个仓位当达到60分钟还未自动平仓时，主动平仓。
+      if(posLiveTime>(3600*4)){//每个仓位当达到4小时还未自动平仓时，主动平仓。
          closeAll();
-         log_info("The position's life is exeeding 3600 senconds,close it.");
+         log_info("The position's life is exeeding 4 hours,close it.");
       }else{
             modifyStopLevel();
       }
@@ -39,21 +39,26 @@ double momentumUp=moveUp+upA*Period();
 double momentumDown=moveDown+downA*Period();
 momentum=int(momentumUp-momentumDown)/10;
 
-if(momentum>-5 && momentum<5)
+if(momentum>-20 && momentum<20)
 {
    momentum=0;
 }
-
-if(MathAbs(move/moveUp)<0.1)
-{
-   momentum=0;
+if(moveUp>0){
+   if(MathAbs(move/moveUp)<0.1)
+   {
+      momentum=0;
+   }
+}else if(moveUp<0){
+   if(MathAbs(move/moveDown)<0.1)
+   {
+      momentum=0;
+   }
 }
-
 return(momentum);
 }
 
 
-//专为Cutail策略开仓
+//专为momentum策略开仓
 void openMomentum(int momentum)
 {
    if(momentum!=0)
@@ -72,15 +77,16 @@ void openMomentum(int momentum)
          RefreshRates();
          double stopLoss=0;
          double takeprofit=0;
-         double minSLDistance=50*Point;
+         double minSLDistance=80*Point;
          double maxSLDistance=180*Point;
-         double minTPDistance=50*Point;
+         double minTPDistance=130*Point;
          double maxTPDistance=210*Point;
          if(momentum>0)
          {
             //另外一种stoploss算法，取前三的最低值
             double lowest=MathMin(Low[1],Low[2]);
-            //lowest=MathMin(lowest,Low[3]);
+            lowest=MathMin(lowest,Low[3]);
+            lowest=MathMin(lowest,Low[4]);
             stopLoss=MathMin((Ask-minSLDistance),lowest);
             if(stopLoss<(Ask-maxSLDistance)){
                stopLoss=Ask-maxSLDistance;
@@ -97,11 +103,10 @@ void openMomentum(int momentum)
             
          }else if(momentum<0)
          {
-
-            
             //另外一种stoploss算法，取前三的最低值
             double highest=MathMax(High[1],High[2]);
-            //highest=MathMax(highest,High[3]);
+            highest=MathMax(highest,High[3]);
+            highest=MathMax(highest,High[4]);
             stopLoss=MathMax((Bid+minSLDistance),highest);
             if(stopLoss>(Bid+maxSLDistance)){
                stopLoss=Bid+maxSLDistance;

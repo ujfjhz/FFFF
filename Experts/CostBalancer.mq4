@@ -11,6 +11,7 @@
 #include <CBAnalyst.mqh>
 #include <CBMessage.mqh>
 #include <CBTradeMomentum.mqh>
+#include <CBTradeMAX.mqh>
 #include <CBMonitor.mqh>
 
 bool isTrade=true;//全局控制是否在tick来临时自动化交易
@@ -128,6 +129,9 @@ int start()
    }else if(stratedy=="cutail"){
    //以cutail策略(收割尾巴)交易
       tradeCutail();
+   }else if(stratedy=="MAX"){
+   //基于快速MA慢速MA的交叉进行交易
+      tradeMAX();
    }else{
    //默认以趋势策略交易
       if(isLastStopLoss()){
