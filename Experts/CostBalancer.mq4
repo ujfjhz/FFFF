@@ -15,8 +15,8 @@
 #include <CBMonitor.mqh>
 
 bool isTrade=true;//全局控制是否在tick来临时自动化交易
-extern string stratedy="cutail";//交易策略。有如下选择：cutail,trend,inertia.默认为cutail收割利润尾巴；trend为按趋势交易；inertia为惯性策略。
-string cbVersion="0.98(140718)";//version
+extern string stratedy="MAX";//交易策略。有如下选择：cutail,trend,inertia.默认为cutail收割利润尾巴；trend为按趋势交易；inertia为惯性策略。
+string cbVersion="0.99(141127)";//version
 
 //+------------------------------------------------------------------+
 //| expert initialization function                                   |
@@ -105,14 +105,14 @@ int start()
       return(0);
    }
    
-
+   //MAX策略，注释掉
    //节假日、消息日平掉所有仓，不进行交易，以规避黑天鹅
-   if(isMessegeDay()||isStopBusinessDay()){
-      closeAll();
+   //if(isMessegeDay()||isStopBusinessDay()){
+   //   closeAll();
       //log_debug("It's in stop business period now ,close all the position,and do nothing.");
       //不再交易
-      return(0);
-   }
+   //  return(0);
+   //}
    
    //if(checkContinuousLoss()){
       //log_info("It's lost continuous this week ,stop trade this week.");
