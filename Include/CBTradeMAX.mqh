@@ -14,9 +14,9 @@
 extern int periodFast=8;//快速MA的period
 extern int periodSlow=26;//慢速MA的period
 int lastIsup=0;//上一bar处于什么状态
-double maDiff=0.0005;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
-double minRateFast=0.0008;
-double minRateSlow=0.001;
+double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
+double minRateFast=0.0005;
+double minRateSlow=0.0001;
 void tradeMAX()
 {
    //this bar
@@ -49,63 +49,78 @@ void tradeMAX()
    if(maFast>maSlow+maDiff)
    {
       thisIsup=10;
-      if(lastIsup<0 && posLiveTime>0)
+      if(posLiveTime>0)
       {
-         closeAll();
-      }
-      if(lastIsup<=0)
+         if(lastIsup<0)
+         {
+            closeAll();
+            if((maFast-maFast1)>=minRateFast && (maSlow1-maSlow)<=minRateSlow)
+            {
+               openMAX(thisIsup);//做多
+            }
+         }else if(lastIsup>=0)
+         {
+            if(posLiveTime>(4*periodFast*Period()*60))
+            {
+               modifyStopLoseMAX(maSlow);
+            }else if(posLiveTime>(2*periodFast*Period()*60))
+            {
+               modifyStopLoseMAX(maSlow-stdDevDown);
+            }else if(posLiveTime>(periodFast*Period()*60))
+            {
+               modifyStopLoseMAX(maSlow-2*stdDevDown);
+            }else
+            {
+               modifyStopLoseMAX(maSlow-3*stdDevDown);
+            }
+         }
+      }else if(posLiveTime==0)
       {
          if((maFast-maFast1)>=minRateFast && (maSlow1-maSlow)<=minRateSlow)
          {
             openMAX(thisIsup);//做多
-         }
-      }else if(lastIsup>0)
-      {
-         if(posLiveTime>(15*Period()*60))
-         {
-            modifyStopLoseMAX(maSlow);
-         }else if(posLiveTime>(10*Period()*60))
-         {
-            modifyStopLoseMAX(maSlow-stdDevDown);
-         }else if(posLiveTime>(5*Period()*60))
-         {
-            modifyStopLoseMAX(maSlow-2*stdDevDown);
-         }else
-         {
-            modifyStopLoseMAX(maSlow-3*stdDevDown);
          }
       }
       lastIsup=thisIsup;
    }else if(maFast<maSlow-maDiff)
    {
       thisIsup=-10;
-      if(lastIsup>0 && posLiveTime>0)
+      
+      if(posLiveTime>0)
       {
-         closeAll();
-      }
-      if(lastIsup>=0)
+         if(lastIsup>0)
+         {
+            closeAll();
+            if((maFast1-maFast)>=minRateFast && (maSlow-maSlow1)<=minRateSlow)
+            {
+               openMAX(thisIsup);//做空
+            }
+         }else if(lastIsup<=0)
+         {
+            if(posLiveTime>(4*periodFast*Period()*60))
+            {
+               modifyStopLoseMAX(maSlow);
+            }else if(posLiveTime>(2*periodFast*Period()*60))
+            {
+               modifyStopLoseMAX(maSlow+stdDevUp);
+            }else if(posLiveTime>(periodFast*Period()*60))
+            {
+               modifyStopLoseMAX(maSlow+2*stdDevUp);
+            }else
+            {
+               modifyStopLoseMAX(maSlow+3*stdDevUp);
+            }
+         }
+      }else if(posLiveTime==0)
       {
          if((maFast1-maFast)>=minRateFast && (maSlow-maSlow1)<=minRateSlow)
          {
             openMAX(thisIsup);//做空
          }
-      }else if(lastIsup<0)
-      {
-         if(posLiveTime>(15*Period()*60))
-         {
-            modifyStopLoseMAX(maSlow);
-         }else if(posLiveTime>(10*Period()*60))
-         {
-            modifyStopLoseMAX(maSlow+stdDevUp);
-         }else if(posLiveTime>(5*Period()*60))
-         {
-            modifyStopLoseMAX(maSlow+2*stdDevUp);
-         }else
-         {
-            modifyStopLoseMAX(maSlow+3*stdDevUp);
-         }
       }
       lastIsup=thisIsup;
+   }else{
+      lastIsup=0;
    }
 }
 
