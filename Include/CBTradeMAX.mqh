@@ -13,7 +13,7 @@
 //MAX追求利润最大化
 extern int periodFast=8;//快速MA的period
 extern int periodSlow=26;//慢速MA的period
-int lastIsup=0;//上一bar处于什么状态
+//int lastIsup=0;//上一bar处于什么状态
 double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
 double minRateFast=0.0005;
 double minRateSlow=0.0001;
@@ -28,7 +28,8 @@ void tradeMAX()
    double maSlow1=iMA(NULL,0,periodSlow,0,MODE_LWMA,PRICE_OPEN,1);  
 
    int posLiveTime = getPosLiveTime();//该货币对已有仓位的存在时间，0表示无仓位
-   int thisIsup=lastIsup;
+   int posType=getPosType();//该货币对已有仓位的类别
+   //int thisIsup=lastIsup;
    
    double devDown=0;//最近periodSlow内价格下跌的方差
    for(int i=0;i<periodSlow;i++)
@@ -48,17 +49,17 @@ void tradeMAX()
    
    if(maFast>maSlow+maDiff)
    {
-      thisIsup=10;
+      //thisIsup=10;
       if(posLiveTime>0)
       {
-         if(lastIsup<0)
+         if(posType<0)
          {
             closeAll();
             if((maFast-maFast1)>=minRateFast && (maSlow1-maSlow)<=minRateSlow)
             {
-               openMAX(thisIsup);//做多
+               openMAX(10);//做多
             }
-         }else if(lastIsup>=0)
+         }else if(posType>0)
          {
             if(posLiveTime>(4*periodFast*Period()*60))
             {
@@ -78,24 +79,24 @@ void tradeMAX()
       {
          if((maFast-maFast1)>=minRateFast && (maSlow1-maSlow)<=minRateSlow)
          {
-            openMAX(thisIsup);//做多
+            openMAX(10);//做多
          }
       }
-      lastIsup=thisIsup;
+      //lastIsup=thisIsup;
    }else if(maFast<maSlow-maDiff)
    {
-      thisIsup=-10;
+      //thisIsup=-10;
       
       if(posLiveTime>0)
       {
-         if(lastIsup>0)
+         if(posType>0)
          {
             closeAll();
             if((maFast1-maFast)>=minRateFast && (maSlow-maSlow1)<=minRateSlow)
             {
-               openMAX(thisIsup);//做空
+               openMAX(-10);//做空
             }
-         }else if(lastIsup<=0)
+         }else if(posType<0)
          {
             if(posLiveTime>(4*periodFast*Period()*60))
             {
@@ -115,10 +116,10 @@ void tradeMAX()
       {
          if((maFast1-maFast)>=minRateFast && (maSlow-maSlow1)<=minRateSlow)
          {
-            openMAX(thisIsup);//做空
+            openMAX(-10);//做空
          }
       }
-      lastIsup=thisIsup;
+      //lastIsup=thisIsup;
    }else{
       lastIsup=0;
    }
