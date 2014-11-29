@@ -13,7 +13,6 @@
 //MAX追求利润最大化
 extern int periodFast=8;//快速MA的period
 extern int periodSlow=26;//慢速MA的period
-//int lastIsup=0;//上一bar处于什么状态
 double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
 double minRateFast=0.0005;
 double minRateSlow=0.0001;
@@ -29,7 +28,6 @@ void tradeMAX()
 
    int posLiveTime = getPosLiveTime();//该货币对已有仓位的存在时间，0表示无仓位
    int posType=getPosType();//该货币对已有仓位的类别
-   //int thisIsup=lastIsup;
    
    double devDown=0;//最近periodSlow内价格下跌的方差
    for(int i=0;i<periodSlow;i++)
@@ -49,7 +47,6 @@ void tradeMAX()
    
    if(maFast>maSlow+maDiff)
    {
-      //thisIsup=10;
       if(posLiveTime>0)
       {
          if(posType<0)
@@ -82,11 +79,8 @@ void tradeMAX()
             openMAX(10);//做多
          }
       }
-      //lastIsup=thisIsup;
    }else if(maFast<maSlow-maDiff)
    {
-      //thisIsup=-10;
-      
       if(posLiveTime>0)
       {
          if(posType>0)
@@ -119,9 +113,8 @@ void tradeMAX()
             openMAX(-10);//做空
          }
       }
-      //lastIsup=thisIsup;
    }else{
-      lastIsup=0;
+      //不需要修改stoplose
    }
 }
 
