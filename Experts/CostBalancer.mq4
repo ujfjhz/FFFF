@@ -105,14 +105,14 @@ int start()
       return(0);
    }
    
-   //MAX策略，注释掉
+
    //节假日、消息日平掉所有仓，不进行交易，以规避黑天鹅
-   //if(isMessegeDay()||isStopBusinessDay()){
-   //   closeAll();
+   if(isMessegeDay()||isStopBusinessDay()){
+      //closeAll();   //MAX策略，必须注释掉强制平仓，否则会损害利润的翻滚
       //log_debug("It's in stop business period now ,close all the position,and do nothing.");
       //不再交易
-   //  return(0);
-   //}
+     return(0);
+   }
    
    //if(checkContinuousLoss()){
       //log_info("It's lost continuous this week ,stop trade this week.");

@@ -14,8 +14,10 @@
 extern int periodFast=8;//快速MA的period
 extern int periodSlow=26;//慢速MA的period
 double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
-double minRateFast=0.0005;
-double minRateSlow=0.0001;
+double minRateFast=0.0005;//fastma必须即时增长0.0005以上
+double minRateSlow=0.0001;//slowma的即时增长必须大于-0.0001
+
+int exemptNumClose=0;//豁免在交叉后强制close的机会数。豁免权在maslow与mafast重合后获取。该属性只属于已有仓位。每bar自动减1
 void tradeMAX()
 {
    //this bar
@@ -29,27 +31,28 @@ void tradeMAX()
    int posLiveTime = getPosLiveTime();//该货币对已有仓位的存在时间，0表示无仓位
    int posType=getPosType();//该货币对已有仓位的类别
    
-   double devDown=0;//最近periodSlow内价格下跌的方差
-   for(int i=0;i<periodSlow;i++)
-   {
-      devDown=devDown+(Open[i]-Low[i])*(Open[i]-Low[i]);
-   }
-   devDown=devDown/periodSlow;
-   double stdDevDown=MathSqrt(devDown);
+   //double devDown=0;//最近periodSlow内价格下跌的方差
+   //for(int i=0;i<periodSlow;i++)
+   //{
+   //   devDown=devDown+(Open[i]-Low[i])*(Open[i]-Low[i]);
+   //}
+   //devDown=devDown/periodSlow;
+   //double stdDevDown=MathSqrt(devDown);
+   double stdDev=iStdDev(NULL,0,26,0,MODE_LWMA,PRICE_MEDIAN,0);
    
-   double devUp=0;//最近periodSlow内价格上涨的方差
-   for(int j=0;j<periodSlow;j++)
-   {
-      devUp=devUp+(Open[j]-High[j])*(Open[j]-High[j]);
-   }
-   devUp=devUp/periodSlow;
-   double stdDevUp=MathSqrt(devUp);
+   //double devUp=0;//最近periodSlow内价格上涨的方差
+   //for(int j=0;j<periodSlow;j++)
+   //{
+   //   devUp=devUp+(Open[j]-High[j])*(Open[j]-High[j]);
+   //}
+   //devUp=devUp/periodSlow;
+   //double stdDevUp=MathSqrt(devUp);
    
    if(maFast>maSlow+maDiff)
    {
       if(posLiveTime>0)
       {
-         if(posType<0)
+         if(posType<0 && exemptNumClose<=0)
          {
             closeAll();
             if((maFast-maFast1)>=minRateFast && (maSlow1-maSlow)<=minRateSlow)
@@ -63,13 +66,13 @@ void tradeMAX()
                modifyStopLoseMAX(maSlow);
             }else if(posLiveTime>(2*periodFast*Period()*60))
             {
-               modifyStopLoseMAX(maSlow-stdDevDown);
+               modifyStopLoseMAX(maSlow-1*stdDev);
             }else if(posLiveTime>(periodFast*Period()*60))
             {
-               modifyStopLoseMAX(maSlow-2*stdDevDown);
+               modifyStopLoseMAX(maSlow-2*stdDev);
             }else
             {
-               modifyStopLoseMAX(maSlow-3*stdDevDown);
+               modifyStopLoseMAX(maSlow-3*stdDev);
             }
          }
       }else if(posLiveTime==0)
@@ -79,11 +82,16 @@ void tradeMAX()
             openMAX(10);//做多
          }
       }
+      
+      if(exemptNumClose>0)
+      {
+         exemptNumClose=exemptNumClose-1;
+      }
    }else if(maFast<maSlow-maDiff)
    {
       if(posLiveTime>0)
       {
-         if(posType>0)
+         if(posType>0 && exemptNumClose<=0)
          {
             closeAll();
             if((maFast1-maFast)>=minRateFast && (maSlow-maSlow1)<=minRateSlow)
@@ -97,13 +105,13 @@ void tradeMAX()
                modifyStopLoseMAX(maSlow);
             }else if(posLiveTime>(2*periodFast*Period()*60))
             {
-               modifyStopLoseMAX(maSlow+stdDevUp);
+               modifyStopLoseMAX(maSlow+1*stdDev);
             }else if(posLiveTime>(periodFast*Period()*60))
             {
-               modifyStopLoseMAX(maSlow+2*stdDevUp);
+               modifyStopLoseMAX(maSlow+2*stdDev);
             }else
             {
-               modifyStopLoseMAX(maSlow+3*stdDevUp);
+               modifyStopLoseMAX(maSlow+3*stdDev);
             }
          }
       }else if(posLiveTime==0)
@@ -113,8 +121,21 @@ void tradeMAX()
             openMAX(-10);//做空
          }
       }
+      
+      if(exemptNumClose>0)
+      {
+         exemptNumClose=exemptNumClose-1;
+      }
    }else{
       //不需要修改stoplose
+      
+      if(posLiveTime>0)
+      {
+         exemptNumClose=4+exemptNumClose;//在maslow与mafast重合后获得豁免权4
+         if(exemptNumClose>10){
+            exemptNumClose=10;
+         }
+      }
    }
 }
 
@@ -170,6 +191,7 @@ void openMAX(double measure)
       if(thisTicket>0)
       {
          log_info("Opened order: "+thisTicket);
+         exemptNumClose=0;//开仓后重置豁免权
          break;
       }else{
          int lastError=GetLastError();                 // Failed :(      
