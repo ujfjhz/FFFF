@@ -16,7 +16,7 @@
 
 bool isTrade=true;//全局控制是否在tick来临时自动化交易
 extern string stratedy="MAX";//交易策略。有如下选择：cutail,trend,inertia.默认为cutail收割利润尾巴；trend为按趋势交易；inertia为惯性策略。
-string cbVersion="0.99(141127)";//version
+string cbVersion="1.0";//version
 
 //+------------------------------------------------------------------+
 //| expert initialization function                                   |
