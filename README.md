@@ -1,4 +1,4 @@
 CostBalancer
 ============
 
-Free software for financial independence.
+Free software for financial freedom.

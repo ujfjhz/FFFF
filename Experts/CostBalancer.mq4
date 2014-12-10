@@ -25,26 +25,6 @@ int init()
   {
    Print("CostBalancer-"+cbVersion+" start running....");
    
-   if(stratedy=="cutail"){
-      maxSymbolCount=20;//因cutail条件苛刻，增加同时交易的货币对
-   }
-   int symbolCount=0;//已经交易的标的数
-   if(GlobalVariableCheck("symbolCount")){
-      symbolCount=GlobalVariableGet("symbolCount");
-   }
-   symbolCount=symbolCount+1;
-   if(symbolCount>maxSymbolCount){
-      isTrade=false;
-      //log_err("已达到最大自动化交易标的数，停止该标的的自动化交易。");
-      log_err("It's reached the max auto-trading symbol count,stopping this instance.");
-   }
-   if(GlobalVariableSet("symbolCount",symbolCount)==0){
-      //log_err("在初始化的自动化交易时设定交易标的数出错:"+GetLastError());
-      log_err("Error:"+GetLastError());
-   }
-   //og_info("初始化完毕，将做为第"+symbolCount+"个实例运行");
-   log_info("Init finished, run as the "+symbolCount+" instance");
-   
    int sumcode = 0;
    for (int i=0; i<StringLen(formula); i++)
    {
@@ -65,18 +45,6 @@ int init()
 //+------------------------------------------------------------------+
 int deinit()
   {
-   int symbolCount=0;//已经交易的标的数
-   if(GlobalVariableCheck("symbolCount")){
-      symbolCount=GlobalVariableGet("symbolCount");
-   }
-   symbolCount=symbolCount-1;
-   if(symbolCount < 0){
-      symbolCount=0;
-   }
-   if(GlobalVariableSet("symbolCount",symbolCount)==0){
-      //log_err("在退出自动化交易时设定交易标的数出错:"+GetLastError());
-      log_err("Error:"+GetLastError());
-   }
    log_info("CostBalancer has been stopped.");
 
    return(0);
@@ -105,12 +73,16 @@ int start()
       return(0);
    }
    
+   //消息日平掉所有仓，不进行交易，以规避黑天鹅
+   if(isMessegeDay()){
+      closeAll(); 
+      log_info("It's in stop business period now ,close all the position,and do nothing.");
+      //不再交易
+     return(0);
+   }
 
    //节假日、消息日平掉所有仓，不进行交易，以规避黑天鹅
-   if(isMessegeDay()||isStopBusinessDay()){
-      //closeAll();   //MAX策略，必须注释掉强制平仓，否则会损害利润的翻滚
-      //log_debug("It's in stop business period now ,close all the position,and do nothing.");
-      //不再交易
+   if(isStopBusinessDay()){
      return(0);
    }
    

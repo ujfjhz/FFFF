@@ -14,8 +14,12 @@
 extern int periodFast=8;//快速MA的period
 extern int periodSlow=26;//慢速MA的period
 double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
+//double maDiff=40*Point;//用point，考虑JPY 
+//TODO JPY在不用Point时表现比用时好很多，考虑优化这几个数的取值
 double minRateFast=0.0005;//fastma必须即时增长0.0005以上
-double minRateSlow=0.0001;//slowma的即时增长必须大于-0.0001
+//double minRateFast=50*Point;
+double minRateSlow=0.0001;//slowma的即时增长必须大于-0.0001  似乎这个影响
+//double minRateSlow=10*Point;
 extern double lotSpecify=0.01;//指定手，开固定的大小
 int exemptNumClose=0;//豁免在交叉后强制close的机会数。豁免权在maslow与mafast重合后获取。该属性只属于已有仓位。每bar自动减1
 void tradeMAX()
@@ -233,7 +237,13 @@ void openMAX(double measure)
                break;                              // Exit 'switch'         
             case 133:
                log_err("Trading forbidden");            
-               break;                              // Exit 'switch'         
+               break;                              // Exit 'switch'      
+            case 4110:
+               log_err("longs  are not allowed in the expert properties");       //TODO 其他地方加上该异常处理     
+               break; 
+            case 4111:
+               log_err("shorts are not allowed in the expert properties");            
+               break;               
             default: 
                log_err("Occurred error :"+lastError);// Other alternatives         
                break;
