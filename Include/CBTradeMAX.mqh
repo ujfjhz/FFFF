@@ -13,21 +13,23 @@
 //MAX追求利润最大化
 extern int periodFast=8;//快速MA的period
 extern int periodSlow=26;//慢速MA的period
-double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
-//double maDiff=40*Point;//用point，考虑JPY 
+extern double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
+//经测试，对于是否开单，影响较大
+//double maDiff=30*Point;//用point，考虑JPY 
 //TODO JPY在不用Point时表现比用时好很多，考虑优化这几个数的取值
-double minRateFast=0.0005;//fastma必须即时增长0.0005以上
+//TODO 在不同的时间尺度应该自动变化
+extern double minRateFast=0.0005;//fastma必须即时增长0.0005以上
 //double minRateFast=50*Point;
-double minRateSlow=0.0001;//slowma的即时增长必须大于-0.0001  似乎这个影响
-//double minRateSlow=10*Point;
+extern double minRateSlow=-0.0001;//slowma的即时增长必须大于-0.0001  似乎这个影响
+//double minRateSlow=-5*Point;
 extern double lotSpecify=0.01;//指定手，开固定的大小
 int exemptNumClose=0;//豁免在交叉后强制close的机会数。豁免权在maslow与mafast重合后获取。该属性只属于已有仓位。每bar自动减1
+int lastUpdownStatus=0;//上一bar的fast与slow MA的相对位置
 void tradeMAX()
 {
    //this bar
    double maFast=iMA(NULL,0,periodFast,0,MODE_LWMA,PRICE_OPEN,0);    
    double maSlow=iMA(NULL,0,periodSlow,0,MODE_LWMA,PRICE_OPEN,0);  
-   
    //last bar
    double maFast1=iMA(NULL,0,periodFast,0,MODE_LWMA,PRICE_OPEN,1);    
    double maSlow1=iMA(NULL,0,periodSlow,0,MODE_LWMA,PRICE_OPEN,1);  
@@ -52,14 +54,43 @@ void tradeMAX()
    //devUp=devUp/periodSlow;
    //double stdDevUp=MathSqrt(devUp);
    
-   if(maFast>maSlow+maDiff)
+
+   //及时close策略：EURUSD表现很差.暂弃用
+   /*
+   //this bar
+   double maCloseFast=iMA(NULL,0,4,0,MODE_LWMA,PRICE_OPEN,0);    
+   //last bar
+   double maCloseFast1=iMA(NULL,0,4,0,MODE_LWMA,PRICE_OPEN,1);    
+   if(posLiveTime>0)//主动及时close
+   {
+      if(posType>0)
+      {
+         if((maCloseFast1-maCloseFast)>=minRateFast  && maCloseFast<(maSlow-maDiff)
+         && (maFast1-maFast)>=minRateFast )
+         {
+            closeAll();
+            return;
+         }
+      }else if(posType<0)
+      {
+         if((maCloseFast-maCloseFast1)>=minRateFast && maCloseFast>(maSlow+maDiff)
+         && (maFast-maFast1)>=minRateFast )
+         {
+            closeAll();
+            return;
+         }
+      }
+   }
+   */
+   
+   if(maFast>(maSlow+maDiff))
    {
       if(posLiveTime>0)
       {
          if(posType<0 && exemptNumClose<=0)
          {
             closeAll();
-            if((maFast-maFast1)>=minRateFast && (maSlow1-maSlow)<=minRateSlow)
+            if((maFast-maFast1)>=minRateFast && (maSlow-maSlow1)>=minRateSlow)
             {
                openMAX(10);//做多
             }
@@ -81,7 +112,7 @@ void tradeMAX()
          }
       }else if(posLiveTime==0)
       {
-         if((maFast-maFast1)>=minRateFast && (maSlow1-maSlow)<=minRateSlow)
+         if((maFast-maFast1)>=minRateFast && (maSlow-maSlow1)>=minRateSlow)
          {
             openMAX(10);//做多
          }
@@ -91,14 +122,15 @@ void tradeMAX()
       {
          exemptNumClose=exemptNumClose-1;
       }
-   }else if(maFast<maSlow-maDiff)
+      lastUpdownStatus=1;
+   }else if(maFast<(maSlow-maDiff))
    {
       if(posLiveTime>0)
       {
          if(posType>0 && exemptNumClose<=0)
          {
             closeAll();
-            if((maFast1-maFast)>=minRateFast && (maSlow-maSlow1)<=minRateSlow)
+            if((maFast1-maFast)>=minRateFast && (maSlow1-maSlow)>=minRateSlow)
             {
                openMAX(-10);//做空
             }
@@ -120,7 +152,7 @@ void tradeMAX()
          }
       }else if(posLiveTime==0)
       {
-         if((maFast1-maFast)>=minRateFast && (maSlow-maSlow1)<=minRateSlow)
+         if((maFast1-maFast)>=minRateFast && (maSlow1-maSlow)>=minRateSlow)
          {
             openMAX(-10);//做空
          }
@@ -130,21 +162,23 @@ void tradeMAX()
       {
          exemptNumClose=exemptNumClose-1;
       }
+      lastUpdownStatus=-1;
    }else{
       //不需要修改stoplose
-      
       if(posLiveTime>0)
+      //if(posLiveTime>0 && lastUpdownStatus==0)    //加上lastUpdownStatus的判断导致EURUSD表现不佳，并且其他的提升也弱微
       {
          exemptNumClose=4+exemptNumClose;//在maslow与mafast重合后获得豁免权4
          if(exemptNumClose>10){
             exemptNumClose=10;
          }
       }
+      lastUpdownStatus=0;
    }
 }
 
-//修改其stoplose为maSlow
-void modifyStopLoseMAX(double maSlow)
+//修改其stoplose为newSL
+void modifyStopLoseMAX(double newSL)
 {
    int total=OrdersTotal();
    for(int pos=0;pos<total;pos++)
@@ -156,11 +190,23 @@ void modifyStopLoseMAX(double maSlow)
             continue;
          }
          
-         if(maSlow!=OrderStopLoss())
+         if(OrderType()==OP_BUY)
          {
-            if(OrderModify(OrderTicket(),OrderOpenPrice(),maSlow,OrderTakeProfit(),0,Blue)==false)
+            if(newSL>OrderStopLoss() || OrderStopLoss()==NULL)
             {
-               log_err("Error: set new stop level for "+OrderTicket()+" failed! errorcode:"+GetLastError());    
+               if(OrderModify(OrderTicket(),OrderOpenPrice(),newSL,OrderTakeProfit(),0,Blue)==false)
+               {
+                  log_err("Error: set new stop level for "+OrderTicket()+" failed! errorcode:"+GetLastError());    
+               }
+            }
+         }else if(OrderType()==OP_SELL)
+         {
+            if(newSL<OrderStopLoss() || OrderStopLoss()==NULL)
+            {
+               if(OrderModify(OrderTicket(),OrderOpenPrice(),newSL,OrderTakeProfit(),0,Blue)==false)
+               {
+                  log_err("Error: set new stop level for "+OrderTicket()+" failed! errorcode:"+GetLastError());    
+               }
             }
          }
       }else
@@ -190,12 +236,13 @@ void openMAX(double measure)
    while(true)
    {
       log_info("The request was sent to the server. Waiting for reply...");
+      //设定最大stoplose distance为价格的3%
       if(measure>0)
       {
-         thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,NULL,NULL,"",MAGICNUMBER,0,Blue);
+         thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,Ask*0.95,NULL,"",MAGICNUMBER,0,Blue);
       }else if(measure<0)
       {
-         thisTicket=OrderSend(Symbol(),OP_SELL,lotToOpen,Bid,slippage,NULL,NULL,"",MAGICNUMBER,0,Red);
+         thisTicket=OrderSend(Symbol(),OP_SELL,lotToOpen,Bid,slippage,Bid*1.05,NULL,"",MAGICNUMBER,0,Red);
       }
       if(thisTicket>0)
       {

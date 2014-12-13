@@ -73,24 +73,28 @@ int start()
       return(0);
    }
    
+
    //消息日平掉所有仓，不进行交易，以规避黑天鹅
    if(isMessegeDay()){
-      closeAll(); 
-      log_info("It's in stop business period now ,close all the position,and do nothing.");
-      //不再交易
-     return(0);
+      if(Period()<=60){//认为小于等于1H级别的可能受黑天鹅影响的概率大
+         closeAll();
+      }
+      log_info("It's in stop business period now ,close the position,and do nothing.");
+      return(0);
    }
 
-   //节假日、消息日平掉所有仓，不进行交易，以规避黑天鹅
+   //节假日，不进行交易，以规避黑天鹅
    if(isStopBusinessDay()){
      return(0);
    }
    
+   /**
    //if(checkContinuousLoss()){
       //log_info("It's lost continuous this week ,stop trade this week.");
       //在判断是否连续loss中输出"It's lost continuous this week ,stop trade this week."，以防每个tick都输出一次。
     //  return(0);
    //}
+   */
    
    //get some data
    processMessage();
