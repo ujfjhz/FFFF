@@ -96,18 +96,18 @@ void tradeMAX()
             }
          }else if(posType>0)
          {
-            if(posLiveTime>(4*periodFast*Period()*60))
+            if(posLiveTime>(3*periodFast*Period()*60))
             {
-               modifyStopLoseMAX(maSlow);
+               modifyStopLoseMAX(stdDev);
             }else if(posLiveTime>(2*periodFast*Period()*60))
             {
-               modifyStopLoseMAX(maSlow-1*stdDev);
+               modifyStopLoseMAX(1.5*stdDev);
             }else if(posLiveTime>(periodFast*Period()*60))
             {
-               modifyStopLoseMAX(maSlow-2*stdDev);
+               modifyStopLoseMAX(2*stdDev);
             }else
             {
-               modifyStopLoseMAX(maSlow-3*stdDev);
+               modifyStopLoseMAX(3*stdDev);
             }
          }
       }else if(posLiveTime==0)
@@ -136,18 +136,18 @@ void tradeMAX()
             }
          }else if(posType<0)
          {
-            if(posLiveTime>(4*periodFast*Period()*60))
+            if(posLiveTime>(3*periodFast*Period()*60))
             {
-               modifyStopLoseMAX(maSlow);
+               modifyStopLoseMAX(stdDev);
             }else if(posLiveTime>(2*periodFast*Period()*60))
             {
-               modifyStopLoseMAX(maSlow+1*stdDev);
+               modifyStopLoseMAX(1.5*stdDev);
             }else if(posLiveTime>(periodFast*Period()*60))
             {
-               modifyStopLoseMAX(maSlow+2*stdDev);
+               modifyStopLoseMAX(2*stdDev);
             }else
             {
-               modifyStopLoseMAX(maSlow+3*stdDev);
+               modifyStopLoseMAX(3*stdDev);
             }
          }
       }else if(posLiveTime==0)
@@ -177,21 +177,62 @@ void tradeMAX()
    }
 }
 
-//修改其stoplose为newSL
-void modifyStopLoseMAX(double newSL)
+//根据stoplose distance修改stoplose (保持单调性)
+void modifyStopLoseMAX(double distSL)
 {
+   //set the min stoplose distance
+   double minDistSL=200*Point;
+   if(Period()>=240){
+      minDistSL=400*Point;
+   }else if(Period()==60){
+      minDistSL=200*Point;
+   }else{
+      minDistSL=100*Point;
+   }
+   
+   //set the maxreturn profit
+   double maxReturnPrice = 3000*Point;
+   
    int total=OrdersTotal();
+   double newSL=0;
+   double maxProfitPoint=0;
    for(int pos=0;pos<total;pos++)
    {
       if(OrderSelect(pos,SELECT_BY_POS)==true)
       {
-         if(OrderSymbol() !=Symbol())// Don't handle other symbols.
+         if(OrderSymbol() !=Symbol()  || OrderMagicNumber()!=Period())// Don't handle other symbols and other timeframes.
          {
             continue;
          }
          
+         //get the max profit return price
+         maxProfitPoint=getMaxProfitPoint();
+         //只有在总盈利超过特定值才更新maxReturnPrice
+         if(maxProfitPoint>4000*Point)
+         {
+            maxReturnPrice=maxProfitPoint*Point/5;
+         }else if(maxProfitPoint>3200*Point)
+         {
+            maxReturnPrice=maxProfitPoint*Point/4;
+         }else if(maxProfitPoint>2400*Point)
+         {
+            maxReturnPrice=maxProfitPoint*Point/3;
+         }else if(maxProfitPoint>1600*Point)
+         {
+            maxReturnPrice=maxProfitPoint*Point/2;
+         }
+        
+         if(distSL>maxReturnPrice && maxProfitPoint>1600*Point){//只针对有足够盈利的仓位进行止损优化
+            distSL=maxReturnPrice;
+         }
+         
+         if(distSL<minDistSL){
+            distSL=minDistSL;
+         }
+         
          if(OrderType()==OP_BUY)
          {
+            newSL=Ask-distSL;
             if(newSL>OrderStopLoss() || OrderStopLoss()==NULL)
             {
                if(OrderModify(OrderTicket(),OrderOpenPrice(),newSL,OrderTakeProfit(),0,Blue)==false)
@@ -201,6 +242,7 @@ void modifyStopLoseMAX(double newSL)
             }
          }else if(OrderType()==OP_SELL)
          {
+            newSL=Bid+distSL;
             if(newSL<OrderStopLoss() || OrderStopLoss()==NULL)
             {
                if(OrderModify(OrderTicket(),OrderOpenPrice(),newSL,OrderTakeProfit(),0,Blue)==false)
@@ -236,13 +278,13 @@ void openMAX(double measure)
    while(true)
    {
       log_info("The request was sent to the server. Waiting for reply...");
-      //设定最大stoplose distance为价格的3%
+      //设定最大stoplose distance为价格的5%
       if(measure>0)
       {
-         thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,Ask*0.95,NULL,"",MAGICNUMBER,0,Blue);
+         thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,Ask*0.95,NULL,"",Period(),0,Blue);
       }else if(measure<0)
       {
-         thisTicket=OrderSend(Symbol(),OP_SELL,lotToOpen,Bid,slippage,Bid*1.05,NULL,"",MAGICNUMBER,0,Red);
+         thisTicket=OrderSend(Symbol(),OP_SELL,lotToOpen,Bid,slippage,Bid*1.05,NULL,"",Period(),0,Red);
       }
       if(thisTicket>0)
       {
