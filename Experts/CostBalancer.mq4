@@ -24,7 +24,8 @@ string cbVersion="1.0";//version
 int init()
   {
    Print("CostBalancer-"+cbVersion+" start running....");
-   
+   int delOldGVCount=GlobalVariablesDeleteAll("MPP_");
+   log_info(delOldGVCount+" globalvariables(MPP_) has been deleted.");
    int sumcode = 0;
    for (int i=0; i<StringLen(formula); i++)
    {
@@ -36,7 +37,22 @@ int init()
 	  
       log_err("auth false");
    }
-
+   
+   //set the stoplose distance
+   if(Period()==1440){
+      minDistSL=1000*Point;
+      maxDistSL=20000*Point;
+   }else if(Period()==240){
+      minDistSL=400*Point;
+      maxDistSL=8000*Point;
+   }else if(Period()==60){
+      minDistSL=200*Point;
+      maxDistSL=4000*Point;
+   }else{
+      minDistSL=100*Point;
+      maxDistSL=1000*Point;
+   }
+   
    return(0);
   }
   

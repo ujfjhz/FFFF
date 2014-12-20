@@ -7,26 +7,38 @@
 #property link      ""
 #include <CBTradeCommon.mqh>
 //基于快速MA慢速MA的交叉进行交易
-//以简单的规则进行交易。若无单，凡快速MA高于慢速MA则做多，反之做空。若有单，只做TP/SL修改，不主动平仓。
-//前1个固定时间主动平仓，后期自动平仓，着重这么处理。
-//SL 最高为慢速MA
+//以简单的规则进行交易。若无单，凡快速MA高于慢速MA则做多，反之做空。只做SL修改，不设TP。
 //MAX追求利润最大化
+
 extern int periodFast=8;//快速MA的period
 extern int periodSlow=26;//慢速MA的period
-extern double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
-//经测试，对于是否开单，影响较大
-//double maDiff=30*Point;//用point，考虑JPY 
-//TODO JPY在不用Point时表现比用时好很多，考虑优化这几个数的取值
-//TODO 在不同的时间尺度应该自动变化
-extern double minRateFast=0.0005;//fastma必须即时增长0.0005以上
-//double minRateFast=50*Point;
-extern double minRateSlow=-0.0001;//slowma的即时增长必须大于-0.0001  似乎这个影响
-//double minRateSlow=-5*Point;
+
+//TODO GBPJPY在(0.0004,0.0005,-0.0001)下表现优越，考虑根据总点数、局部幅度来动态优化其他品种的参数
+double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
+double minRateFast=0.0005;//fastma必须即时增长0.0005以上
+double minRateSlow=-0.0001;//slowma的即时增长必须大于-0.0001  似乎这个影响
+
+double minDistSL=200*Point;
+double maxDistSL=2000*Point;
+
 extern double lotSpecify=0.01;//指定手，开固定的大小
-int exemptNumClose=0;//豁免在交叉后强制close的机会数。豁免权在maslow与mafast重合后获取。该属性只属于已有仓位。每bar自动减1
+int exemptNumClose=0;//豁免在交叉后强制close的机会数。豁免权在开仓后，maslow与mafast交叉或重合后获取。该属性只属于已有仓位。每bar自动减1。
 int lastUpdownStatus=0;//上一bar的fast与slow MA的相对位置
+double stdDev=0; //价格波动的方差
 void tradeMAX()
 {
+   /*
+   //基于GBPJPY的规范化
+   double maYear=iMA(NULL,PERIOD_D1,360,0,MODE_LWMA,PRICE_OPEN,0);    
+   double paramFactor=1;
+   if(maYear!=0){
+      paramFactor=MathPow(10,(21500*10)/(maYear/Point)-1);
+   }
+   maDiff=40*Point*paramFactor/100;
+   minRateFast=50*Point*paramFactor/100;
+   minRateSlow=-10*Point*paramFactor/100;
+   */
+
    //this bar
    double maFast=iMA(NULL,0,periodFast,0,MODE_LWMA,PRICE_OPEN,0);    
    double maSlow=iMA(NULL,0,periodSlow,0,MODE_LWMA,PRICE_OPEN,0);  
@@ -44,7 +56,7 @@ void tradeMAX()
    //}
    //devDown=devDown/periodSlow;
    //double stdDevDown=MathSqrt(devDown);
-   double stdDev=iStdDev(NULL,0,26,0,MODE_LWMA,PRICE_MEDIAN,0);
+   stdDev=iStdDev(NULL,0,26,0,MODE_LWMA,PRICE_MEDIAN,0);
    
    //double devUp=0;//最近periodSlow内价格上涨的方差
    //for(int j=0;j<periodSlow;j++)
@@ -54,39 +66,18 @@ void tradeMAX()
    //devUp=devUp/periodSlow;
    //double stdDevUp=MathSqrt(devUp);
    
-
-   //及时close策略：EURUSD表现很差.暂弃用
-   /*
-   //this bar
-   double maCloseFast=iMA(NULL,0,4,0,MODE_LWMA,PRICE_OPEN,0);    
-   //last bar
-   double maCloseFast1=iMA(NULL,0,4,0,MODE_LWMA,PRICE_OPEN,1);    
-   if(posLiveTime>0)//主动及时close
-   {
-      if(posType>0)
-      {
-         if((maCloseFast1-maCloseFast)>=minRateFast  && maCloseFast<(maSlow-maDiff)
-         && (maFast1-maFast)>=minRateFast )
-         {
-            closeAll();
-            return;
-         }
-      }else if(posType<0)
-      {
-         if((maCloseFast-maCloseFast1)>=minRateFast && maCloseFast>(maSlow+maDiff)
-         && (maFast-maFast1)>=minRateFast )
-         {
-            closeAll();
-            return;
-         }
-      }
-   }
-   */
-   
    if(maFast>(maSlow+maDiff))
    {
       if(posLiveTime>0)
       {
+         if(lastUpdownStatus<0)
+         {
+            exemptNumClose=3+exemptNumClose;
+            if(exemptNumClose>8){
+               exemptNumClose=8;
+            }
+         }
+      
          if(posType<0 && exemptNumClose<=0)
          {
             closeAll();
@@ -98,16 +89,16 @@ void tradeMAX()
          {
             if(posLiveTime>(3*periodFast*Period()*60))
             {
-               modifyStopLoseMAX(stdDev);
+               modifyStopLoseMAX(MathMax(1*stdDev,MathAbs(maSlow-Ask)));
             }else if(posLiveTime>(2*periodFast*Period()*60))
             {
-               modifyStopLoseMAX(1.5*stdDev);
+               modifyStopLoseMAX(MathMax(1.5*stdDev,MathAbs(maSlow-Ask)));
             }else if(posLiveTime>(periodFast*Period()*60))
             {
-               modifyStopLoseMAX(2*stdDev);
+               modifyStopLoseMAX(MathMax(2*stdDev,MathAbs(maSlow-Ask)));
             }else
             {
-               modifyStopLoseMAX(3*stdDev);
+               modifyStopLoseMAX(MathMax(3*stdDev,MathAbs(maSlow-Ask)));
             }
          }
       }else if(posLiveTime==0)
@@ -127,6 +118,13 @@ void tradeMAX()
    {
       if(posLiveTime>0)
       {
+         if(lastUpdownStatus>0)
+         {
+            exemptNumClose=3+exemptNumClose;
+            if(exemptNumClose>8){
+               exemptNumClose=8;
+            }
+         }
          if(posType>0 && exemptNumClose<=0)
          {
             closeAll();
@@ -138,16 +136,16 @@ void tradeMAX()
          {
             if(posLiveTime>(3*periodFast*Period()*60))
             {
-               modifyStopLoseMAX(stdDev);
+               modifyStopLoseMAX(MathMax(1*stdDev,MathAbs(maSlow-Bid)));
             }else if(posLiveTime>(2*periodFast*Period()*60))
             {
-               modifyStopLoseMAX(1.5*stdDev);
+               modifyStopLoseMAX(MathMax(1.5*stdDev,MathAbs(maSlow-Bid)));
             }else if(posLiveTime>(periodFast*Period()*60))
             {
-               modifyStopLoseMAX(2*stdDev);
+               modifyStopLoseMAX(MathMax(2*stdDev,MathAbs(maSlow-Bid)));
             }else
             {
-               modifyStopLoseMAX(3*stdDev);
+               modifyStopLoseMAX(MathMax(3*stdDev,MathAbs(maSlow-Bid)));
             }
          }
       }else if(posLiveTime==0)
@@ -166,11 +164,10 @@ void tradeMAX()
    }else{
       //不需要修改stoplose
       if(posLiveTime>0)
-      //if(posLiveTime>0 && lastUpdownStatus==0)    //加上lastUpdownStatus的判断导致EURUSD表现不佳，并且其他的提升也弱微
       {
-         exemptNumClose=4+exemptNumClose;//在maslow与mafast重合后获得豁免权4
-         if(exemptNumClose>10){
-            exemptNumClose=10;
+         exemptNumClose=3+exemptNumClose;//在maslow与mafast重合后获得豁免权3
+         if(exemptNumClose>8){
+            exemptNumClose=8;
          }
       }
       lastUpdownStatus=0;
@@ -180,16 +177,6 @@ void tradeMAX()
 //根据stoplose distance修改stoplose (保持单调性)
 void modifyStopLoseMAX(double distSL)
 {
-   //set the min stoplose distance
-   double minDistSL=200*Point;
-   if(Period()>=240){
-      minDistSL=400*Point;
-   }else if(Period()==60){
-      minDistSL=200*Point;
-   }else{
-      minDistSL=100*Point;
-   }
-   
    //set the maxreturn profit
    double maxReturnPrice = 3000*Point;
    
@@ -208,26 +195,29 @@ void modifyStopLoseMAX(double distSL)
          //get the max profit return price
          maxProfitPoint=getMaxProfitPoint();
          //只有在总盈利超过特定值才更新maxReturnPrice
-         if(maxProfitPoint>4000*Point)
+         if(maxProfitPoint>10000)
          {
             maxReturnPrice=maxProfitPoint*Point/5;
-         }else if(maxProfitPoint>3200*Point)
+         }else if(maxProfitPoint>7000)
          {
             maxReturnPrice=maxProfitPoint*Point/4;
-         }else if(maxProfitPoint>2400*Point)
+         }else if(maxProfitPoint>4500)
          {
             maxReturnPrice=maxProfitPoint*Point/3;
-         }else if(maxProfitPoint>1600*Point)
+         }else if(maxProfitPoint>2500)
          {
             maxReturnPrice=maxProfitPoint*Point/2;
          }
         
-         if(distSL>maxReturnPrice && maxProfitPoint>1600*Point){//只针对有足够盈利的仓位进行止损优化
+         if(distSL>maxReturnPrice && maxProfitPoint>2500){//只针对有足够盈利的仓位进行止损优化
             distSL=maxReturnPrice;
          }
          
          if(distSL<minDistSL){
             distSL=minDistSL;
+         }
+         if(distSL>maxDistSL){
+            distSL=maxDistSL;
          }
          
          if(OrderType()==OP_BUY)
@@ -275,16 +265,29 @@ void openMAX(double measure)
    //交易前先刷新价格
    RefreshRates();
    int thisTicket=0;
+   double distSLOpen=0;
+   if((3*stdDev)>maxDistSL)
+   {
+      distSLOpen=maxDistSL;
+   }else{
+      distSLOpen=3*stdDev;
+   }
+   if((3*stdDev)<minDistSL)
+   {
+      distSLOpen=minDistSL;
+   }else{
+      distSLOpen=3*stdDev;
+   }
    while(true)
    {
       log_info("The request was sent to the server. Waiting for reply...");
-      //设定最大stoplose distance为价格的5%
       if(measure>0)
       {
-         thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,Ask*0.95,NULL,"",Period(),0,Blue);
+
+         thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,Ask-distSLOpen,NULL,"",Period(),0,Blue);
       }else if(measure<0)
       {
-         thisTicket=OrderSend(Symbol(),OP_SELL,lotToOpen,Bid,slippage,Bid*1.05,NULL,"",Period(),0,Red);
+         thisTicket=OrderSend(Symbol(),OP_SELL,lotToOpen,Bid,slippage,Bid+distSLOpen,NULL,"",Period(),0,Red);
       }
       if(thisTicket>0)
       {
