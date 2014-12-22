@@ -24,8 +24,8 @@ string cbVersion="1.0";//version
 int init()
   {
    Print("CostBalancer-"+cbVersion+" start running....");
-   int delOldGVCount=GlobalVariablesDeleteAll("MPP_");
-   log_info(delOldGVCount+" globalvariables(MPP_) has been deleted.");
+   //int delOldGVCount=GlobalVariablesDeleteAll("MPP_");
+   //log_info(delOldGVCount+" globalvariables(MPP_) has been deleted.");
    int sumcode = 0;
    for (int i=0; i<StringLen(formula); i++)
    {
@@ -112,7 +112,7 @@ int start()
    //}
    */
    
-   //get some data
+   //get and send  message
    processMessage();
    
    if(stratedy=="momentum"){

@@ -178,11 +178,11 @@ void tradeMAX()
 void modifyStopLoseMAX(double distSL)
 {
    //set the maxreturn profit
-   double maxReturnPrice = 3000*Point;
+   //double maxReturnPrice = 3000*Point;
    
    int total=OrdersTotal();
    double newSL=0;
-   double maxProfitPoint=0;
+   //double maxProfitPoint=0;
    for(int pos=0;pos<total;pos++)
    {
       if(OrderSelect(pos,SELECT_BY_POS)==true)
@@ -192,6 +192,8 @@ void modifyStopLoseMAX(double distSL)
             continue;
          }
          
+         /*
+         相对MAXPROFIT的止损策略与一般止损策略逻辑上不协调，并且测试效果非常差，取消之。
          //get the max profit return price
          maxProfitPoint=getMaxProfitPoint();
          //只有在总盈利超过特定值才更新maxReturnPrice
@@ -212,6 +214,7 @@ void modifyStopLoseMAX(double distSL)
          if(distSL>maxReturnPrice && maxProfitPoint>2500){//只针对有足够盈利的仓位进行止损优化
             distSL=maxReturnPrice;
          }
+         */
          
          if(distSL<minDistSL){
             distSL=minDistSL;
