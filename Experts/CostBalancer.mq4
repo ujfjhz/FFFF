@@ -132,6 +132,9 @@ int start()
       }
       tradeTrend();
    }
+   
+   //monitor
+   monitor();
 
    return(0);
   }
