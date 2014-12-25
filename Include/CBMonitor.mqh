@@ -9,9 +9,9 @@ extern string monitor="GBPJPY240";	//默认只由GBPJPY4H负责邮件发送
 
 int monitor()
 {
-	if((Symbol()+Period())==monitor && TimeHour(Time[0])==14 && TimeDayOfWeek(Time[0])<=6 && TimeDayOfWeek(Time[0])>=1)	
+	if((Symbol()+Period())==monitor && TimeHour(Time[0])==0 && TimeMinute(Time[0])==0 && TimeDayOfWeek(Time[0])<=6 && TimeDayOfWeek(Time[0])>=2)	
 	{
-		string title="[CostBalancer][dailyreport] Balance:"+AccountBalance()+", Equity:"+AccountEquity();
+		string title="[CostBalancer][report]Balance:"+AccountBalance()+",Equity:"+AccountEquity();
 		string content="THE OPEN ORDERS :";
 		content=content+"\nOrderSymbol\tOrderLots\tOrderProfit";
 		
