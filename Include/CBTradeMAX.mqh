@@ -10,8 +10,8 @@
 //以简单的规则进行交易。若无单，凡快速MA高于慢速MA则做多，反之做空。只做SL修改，不设TP。
 //MAX追求利润最大化
 
-extern int periodFast=8;//快速MA的period
-extern int periodSlow=26;//慢速MA的period
+extern int periodFast=80;//快速MA的period
+extern int periodSlow=260;//慢速MA的period
 
 //TODO GBPJPY在(0.0004,0.0005,-0.0001)下表现优越，考虑根据总点数、局部幅度来动态优化其他品种的参数
 double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
@@ -21,7 +21,7 @@ double minRateSlow=-0.0001;//slowma的即时增长必须大于-0.0001  似乎这
 double minDistSL=200*Point;
 double maxDistSL=2000*Point;
 
-extern double lotSpecify=0.01;//指定手，开固定的大小
+extern double lotSpecify=0.02;//指定手，开固定的大小
 int exemptNumClose=0;//豁免在交叉后强制close的机会数。豁免权在开仓后，maslow与mafast交叉或重合后获取。该属性只属于已有仓位。每bar自动减1。
 int lastUpdownStatus=0;//上一bar的fast与slow MA的相对位置
 double stdDev=0; //价格波动的方差
@@ -187,7 +187,7 @@ void modifyStopLoseMAX(double distSL)
    {
       if(OrderSelect(pos,SELECT_BY_POS)==true)
       {
-         if(OrderSymbol() !=Symbol()  || OrderMagicNumber()!=Period())// Don't handle other symbols and other timeframes.
+         if(OrderSymbol() !=Symbol()  || OrderMagicNumber()!=MAGICNUMBER)// Don't handle other symbols and other timeframes and other stratedy.
          {
             continue;
          }
@@ -287,10 +287,10 @@ void openMAX(double measure)
       if(measure>0)
       {
 
-         thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,Ask-distSLOpen,NULL,"",Period(),0,Blue);
+         thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,Ask-distSLOpen,NULL,"",MAGICNUMBER,0,Blue);
       }else if(measure<0)
       {
-         thisTicket=OrderSend(Symbol(),OP_SELL,lotToOpen,Bid,slippage,Bid+distSLOpen,NULL,"",Period(),0,Red);
+         thisTicket=OrderSend(Symbol(),OP_SELL,lotToOpen,Bid,slippage,Bid+distSLOpen,NULL,"",MAGICNUMBER,0,Red);
       }
       if(thisTicket>0)
       {

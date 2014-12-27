@@ -99,7 +99,7 @@ void openMomentum(int momentum)
             if(takeprofit>(Ask+maxTPDistance)){
                takeprofit=Ask+maxTPDistance;
             }
-            thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,stopLoss,takeprofit,"",Period(),0,Blue);
+            thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,stopLoss,takeprofit,"",MAGICNUMBER,0,Blue);
             
          }else if(momentum<0)
          {
@@ -119,7 +119,7 @@ void openMomentum(int momentum)
             if(takeprofit<(Bid-maxTPDistance)){
                takeprofit=Bid-maxTPDistance;
             }
-            thisTicket=OrderSend(Symbol(),OP_SELL,lotToOpen,Bid,slippage,stopLoss,takeprofit,"",Period(),0,Red);
+            thisTicket=OrderSend(Symbol(),OP_SELL,lotToOpen,Bid,slippage,stopLoss,takeprofit,"",MAGICNUMBER,0,Red);
          }
          if(thisTicket>0)
          {

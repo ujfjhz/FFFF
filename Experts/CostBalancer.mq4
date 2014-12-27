@@ -12,11 +12,13 @@
 #include <CBMessage.mqh>
 #include <CBTradeMomentum.mqh>
 #include <CBTradeMAX.mqh>
+#include <CBTradeTouch.mqh>
 #include <CBMonitor.mqh>
 
-bool isTrade=true;//全局控制是否在tick来临时自动化交易
-extern string stratedy="MAX";//交易策略。有如下选择：cutail,trend,inertia.默认为cutail收割利润尾巴；trend为按趋势交易；inertia为惯性策略。
-string cbVersion="1.0";//version
+bool isTickStart=true;//全局控制是否在tick来临时开始自动处理
+extern string stratedy="true";//交易策略。有如下选择：cutail,trend,inertia.默认为cutail收割利润尾巴；trend为按趋势交易；inertia为惯性策略。
+string cbVersion="2.0";//version
+int MAGICNUMBER=0;//用于同品种在不同的策略或者在不同的图上能独立运行
 
 //+------------------------------------------------------------------+
 //| expert initialization function                                   |
@@ -33,9 +35,8 @@ int init()
    }
    if(sumcode!=7667)
    {
-      isTrade=false;
-	  
-      log_err("auth false");
+      isTickStart=false;
+      log_fatal("Auth false. I will not process the new ticket any more.");
    }
    
    //set the stoplose distance
@@ -51,6 +52,25 @@ int init()
    }else{
       minDistSL=100*Point;
       maxDistSL=1000*Point;
+   }
+   
+   MAGICNUMBER=Period()*1000;//map to big number ，避免冲突，可支持(1440-1*1000)个不同的策略并发执行
+   if(stratedy=="momentum"){
+      MAGICNUMBER=MAGICNUMBER+1;
+   }else if(stratedy=="cutail"){
+      MAGICNUMBER=MAGICNUMBER+2;
+   }else if(stratedy=="MAX"){
+      MAGICNUMBER=MAGICNUMBER+3;
+   }else if(stratedy=="trend"){
+      MAGICNUMBER=MAGICNUMBER+4;
+   }else if(stratedy=="touch"){
+      MAGICNUMBER=MAGICNUMBER+5;
+   }
+   
+   if(MAGICNUMBER==(Period()*1000))
+   {
+      isTickStart=false;
+      log_fatal("The MAGICNUMBER is not set. I will not process the new ticket any more.");
    }
    
    return(0);
@@ -71,24 +91,22 @@ int deinit()
 //+------------------------------------------------------------------+
 int start()
   {
-   //---- trade  only for first tiks of new bar.
+   //是否开始自动处理
+   if(!isTickStart){
+      return(0);
+   }
+   
+   //trade  only for first tiks of new bar.
    if(Volume[0]>1)
    {
       return(0);
    }
-
    
-   //是否自动化交易
-   if(!isTrade){
-      return(0);
-   }
-   
-   //---- check for history and trading
+   //check for history and trading
    if(Bars<100 || IsTradeAllowed()==false)
    {
       return(0);
    }
-   
 
    //消息日平掉所有仓，不进行交易，以规避黑天鹅
    if(isMessegeDay()){
@@ -115,6 +133,7 @@ int start()
    //get and send  message
    processMessage();
    
+   //Note: 在增加新策略时，除了这里添加外，还必须在init()中分配MAGICNUMBER
    if(stratedy=="momentum"){
    //以惯性策略交易
       tradeMomentum();
@@ -124,13 +143,15 @@ int start()
    }else if(stratedy=="MAX"){
    //基于快速MA慢速MA的交叉进行交易
       tradeMAX();
-   }else{
-   //默认以趋势策略交易
+   }else if(stratedy=="trend"){
+   //以趋势策略交易
       if(isLastStopLoss()){
          log_info("There's a ticket stop loss in the last hour,thus stop trade in this bar.");
          return(0);
       }
       tradeTrend();
+   }else if(stratedy=="touch"){
+      tradeTouch();
    }
    
    //monitor
