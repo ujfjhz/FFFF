@@ -17,7 +17,7 @@
 
 bool isTickStart=true;//全局控制是否在tick来临时开始自动处理
 extern string stratedy="true";//交易策略。有如下选择：cutail,trend,inertia.默认为cutail收割利润尾巴；trend为按趋势交易；inertia为惯性策略。
-string cbVersion="2.0";//version
+string cbVersion="1.0";//version
 int MAGICNUMBER=0;//用于同品种在不同的策略或者在不同的图上能独立运行
 
 //+------------------------------------------------------------------+

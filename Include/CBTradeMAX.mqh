@@ -22,7 +22,7 @@ double minDistSL=200*Point;
 double maxDistSL=2000*Point;
 
 extern double lotSpecify=0.02;//指定手，开固定的大小
-int exemptNumClose=0;//豁免在交叉后强制close的机会数。豁免权在开仓后，maslow与mafast交叉或重合后获取。该属性只属于已有仓位。每bar自动减1。
+int exemptNumClose=0;//豁免在交叉后强制close的机会数。豁免权在开仓后，maslow与mafast交叉或重合后有机会获取。该属性只属于已有仓位。每bar自动减1。
 int lastUpdownStatus=0;//上一bar的fast与slow MA的相对位置
 double stdDev=0; //价格波动的方差
 void tradeMAX()
@@ -45,6 +45,9 @@ void tradeMAX()
    //last bar
    double maFast1=iMA(NULL,0,periodFast,0,MODE_LWMA,PRICE_OPEN,1);    
    double maSlow1=iMA(NULL,0,periodSlow,0,MODE_LWMA,PRICE_OPEN,1);  
+   //last two*periodFast bar
+   double maFast2=iMA(NULL,0,periodFast,0,MODE_LWMA,PRICE_OPEN,MathMax(2*periodFast,10));    
+   double maSlow2=iMA(NULL,0,periodSlow,0,MODE_LWMA,PRICE_OPEN,MathMax(2*periodFast,10));  
 
    int posLiveTime = getPosLiveTime();//该货币对已有仓位的存在时间，0表示无仓位
    int posType=getPosType();//该货币对已有仓位的类别
@@ -70,7 +73,7 @@ void tradeMAX()
    {
       if(posLiveTime>0)
       {
-         if(lastUpdownStatus<0)
+         if(lastUpdownStatus<0 && (maFast2+maDiff)<maSlow2 ) //考虑加上 && maFast<(maSlow+n*maDiff)
          {
             exemptNumClose=3+exemptNumClose;
             if(exemptNumClose>8){
@@ -87,13 +90,13 @@ void tradeMAX()
             }
          }else if(posType>0)
          {
-            if(posLiveTime>(3*periodFast*Period()*60))
+            if(posLiveTime>(3*MathMax(5,periodFast)*Period()*60))
             {
                modifyStopLoseMAX(MathMax(1*stdDev,MathAbs(maSlow-Ask)));
-            }else if(posLiveTime>(2*periodFast*Period()*60))
+            }else if(posLiveTime>(2*MathMax(5,periodFast)*Period()*60))
             {
                modifyStopLoseMAX(MathMax(1.5*stdDev,MathAbs(maSlow-Ask)));
-            }else if(posLiveTime>(periodFast*Period()*60))
+            }else if(posLiveTime>(MathMax(5,periodFast)*Period()*60))
             {
                modifyStopLoseMAX(MathMax(2*stdDev,MathAbs(maSlow-Ask)));
             }else
@@ -118,7 +121,7 @@ void tradeMAX()
    {
       if(posLiveTime>0)
       {
-         if(lastUpdownStatus>0)
+         if(lastUpdownStatus>0 && (maFast2-maDiff)>maSlow2)
          {
             exemptNumClose=3+exemptNumClose;
             if(exemptNumClose>8){
@@ -134,13 +137,13 @@ void tradeMAX()
             }
          }else if(posType<0)
          {
-            if(posLiveTime>(3*periodFast*Period()*60))
+            if(posLiveTime>(3*MathMax(5,periodFast)*Period()*60))
             {
                modifyStopLoseMAX(MathMax(1*stdDev,MathAbs(maSlow-Bid)));
-            }else if(posLiveTime>(2*periodFast*Period()*60))
+            }else if(posLiveTime>(2*MathMax(5,periodFast)*Period()*60))
             {
                modifyStopLoseMAX(MathMax(1.5*stdDev,MathAbs(maSlow-Bid)));
-            }else if(posLiveTime>(periodFast*Period()*60))
+            }else if(posLiveTime>(MathMax(5,periodFast)*Period()*60))
             {
                modifyStopLoseMAX(MathMax(2*stdDev,MathAbs(maSlow-Bid)));
             }else
@@ -163,16 +166,29 @@ void tradeMAX()
       lastUpdownStatus=-1;
    }else{
       //不需要修改stoplose
-      if(posLiveTime>0)
+      if(posType<0)
       {
-         exemptNumClose=3+exemptNumClose;//在maslow与mafast重合后获得豁免权3
-         if(exemptNumClose>8){
-            exemptNumClose=8;
+         if(lastUpdownStatus<0 && (maFast2+maDiff)<maSlow2 ) 
+         {
+            exemptNumClose=3+exemptNumClose;
+            if(exemptNumClose>8){
+               exemptNumClose=8;
+            }
+         }
+      }else if(posType>0)
+      {
+         if(lastUpdownStatus>0 && (maFast2-maDiff)>maSlow2)
+         {
+            exemptNumClose=3+exemptNumClose;
+            if(exemptNumClose>8){
+               exemptNumClose=8;
+            }
          }
       }
       lastUpdownStatus=0;
    }
 }
+
 
 //根据stoplose distance修改stoplose (保持单调性)
 void modifyStopLoseMAX(double distSL)
