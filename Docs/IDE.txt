@@ -4,6 +4,10 @@
 2) compiler
    scite-mql-1.4.2 didn't support the new MT4(600+), and you can
    download the "MQL4/MQL5 Compiler" seperately from the MT4 package
+	http://files.metaquotes.net/metaquotes.software.corp/mt5/mql.exe 
+	32 bit version.
+	http://files.metaquotes.net/metaquotes.software.corp/mt5/mql64.exe 
+	64 bit version.
 
 3) config
    (i)  start scite
