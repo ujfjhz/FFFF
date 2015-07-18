@@ -12,18 +12,13 @@
 //注意，如下参数不可定义为extern,，以防不同的ea实例间产生不一致。
 int costFund=1000;//本金，单位为$。本金的数量级间为2倍关系。if (equity >= costFund*2){costFund = costFund*2}。
 
-int symbolQuota=10; //每个标的的资金配额
+int symbolQuota=30; //每个标的的资金配额
 
 //+------------------------------------------------------------------+
 
 //获取当前标的的可用资金配额
 double getQuota()
 {
-if(debug)
-{
-	//因测试环境的杠杆也较低，所以需要指定得大些
-	symbolQuota=30;
-}
 
 double maxSymbolQuota=symbolQuota;
 
