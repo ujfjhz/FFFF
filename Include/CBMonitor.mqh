@@ -5,12 +5,12 @@
 //+------------------------------------------------------------------+
 #property copyright "ArchestMage"
 #property link      ""
-extern string monitor="GBPJPY240";	//默认只由GBPJPY4H负责邮件发送
+extern string monitor="GBPJPYdd240";	//默认只由GBPJPY4H负责邮件发送
 
 int monitor()
 {
 	//NewYork Close Time 20:00 , Monday to Friday ，即北京时间周二至周六的凌晨1点或者2点
-	if((Symbol()+Period())==monitor && TimeHour(Time[0])==20 && TimeMinute(Time[0])<3 && TimeDayOfWeek(Time[0])<=5 && TimeDayOfWeek(Time[0])>=1)	
+	if((Symbol()+Period())==monitor && TimeHour(Time[0])==20 && TimeMinute(Time[0])==0 && TimeDayOfWeek(Time[0])<=5 && TimeDayOfWeek(Time[0])>=1)	
 	{
 		string title="[REPORT]Balance:"+AccountBalance()+",Equity:"+AccountEquity();
 		string content="THE OPEN ORDERS :";
@@ -24,7 +24,7 @@ int monitor()
 			 content=content+"\n"+OrderSymbol()+"\t"+OrderLots()+"\t"+OrderProfit();
 		   }
 		}
-
+		log_info(title);
 		if(!SendMail(title,content)){
 			log_err("Send mail failed. The title is :"+title+". The error code is:"+GetLastError());    ;
 		}

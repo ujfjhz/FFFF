@@ -31,12 +31,11 @@ int deinit()
 //+------------------------------------------------------------------+
 //| expert start function                                            |
 //+------------------------------------------------------------------+
+string start="GBPJPY240";	
 int start()
   {
-//----
-double bid = Bid;
-count++;
-      Alert(count+":"+bid);
+start=(Symbol()+Period());
+      Alert(start);
 //----
    return(0);
   }

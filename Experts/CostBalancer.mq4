@@ -25,7 +25,12 @@ int MAGICNUMBER=0;//用于同品种在不同的策略或者在不同的图上能
 //+------------------------------------------------------------------+
 int init()
   {
-   Print("CostBalancer-"+cbVersion+" start running....");
+   Print("CostBalancer-"+cbVersion+" start running for "+Symbol()+"....");
+   Print(MarketInfo(Symbol(),MODE_LOTSIZE));
+   Print(MarketInfo(Symbol(),MODE_MINLOT));
+   Print(MarketInfo(Symbol(),MODE_LOTSTEP));
+   Print(MarketInfo(Symbol(),MODE_MAXLOT));
+   Print(MarketInfo(Symbol(),MODE_MARGINREQUIRED));
    //int delOldGVCount=GlobalVariablesDeleteAll("MPP_");
    //log_info(delOldGVCount+" globalvariables(MPP_) has been deleted.");
    int sumcode = 0;

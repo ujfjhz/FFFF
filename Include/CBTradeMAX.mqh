@@ -271,16 +271,17 @@ void openMAX(double measure)
 {
    double lotToOpen=lotSpecify;
    //double lotToOpen=analyseLotToOpen(measure);
-   log_debug("try to open :"+lotToOpen);
+ 
    if(lotToOpen<=0)
    {
       return;
    }
-   if(lotToOpen>0.04)
-   {
-      lotToOpen=0.04;
+   if(lotToOpen>1)
+   {//each time, we'd better trade not greater than 1 lot.
+      lotToOpen=1;
    }
-   
+   log_debug("try to open :"+lotToOpen);
+     
    //交易前先刷新价格
    RefreshRates();
    int thisTicket=0;
@@ -297,8 +298,15 @@ void openMAX(double measure)
    }else{
       distSLOpen=3*stdDev;
    }
+   int retryCount=0;
    while(true)
    {
+      retryCount=retryCount+1;
+      if(retryCount>10)
+      {
+         log_err("Retry count reach the max, break it.");
+         break;
+      }
       log_info("The request was sent to the server. Waiting for reply...");
       if(measure>0)
       {
