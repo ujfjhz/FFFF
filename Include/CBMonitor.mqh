@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "ArchestMage"
 #property link      ""
-extern string monitor="GBPJPYdd240";	//默认只由GBPJPY4H负责邮件发送
+extern string monitor="GBPJPY240";	//默认只由GBPJPY4H负责邮件发送
 
 int monitor()
 {
