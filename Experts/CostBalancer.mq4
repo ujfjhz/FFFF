@@ -17,8 +17,9 @@
 
 bool isTickStart=true;//全局控制是否在tick来临时开始自动处理
 extern string stratedy="true";//交易策略。有如下选择：cutail,trend,inertia.默认为cutail收割利润尾巴；trend为按趋势交易；inertia为惯性策略。
-string cbVersion="1.0";//version
+string cbVersion="1.0-151022";//version
 int MAGICNUMBER=0;//用于同品种在不同的策略或者在不同的图上能独立运行
+datetime prevtime=0; //the time of bar which before the just coming ticket. the new ticket can form a new bar or just add to the old bar.
 
 //+------------------------------------------------------------------+
 //| expert initialization function                                   |
@@ -26,11 +27,11 @@ int MAGICNUMBER=0;//用于同品种在不同的策略或者在不同的图上能
 int init()
   {
    Print("CostBalancer-"+cbVersion+" start running for "+Symbol()+"....");
-   Print(MarketInfo(Symbol(),MODE_LOTSIZE));
-   Print(MarketInfo(Symbol(),MODE_MINLOT));
-   Print(MarketInfo(Symbol(),MODE_LOTSTEP));
-   Print(MarketInfo(Symbol(),MODE_MAXLOT));
-   Print(MarketInfo(Symbol(),MODE_MARGINREQUIRED));
+   Print("Lot size in the base currency: "+MarketInfo(Symbol(),MODE_LOTSIZE));
+   Print("Minimum permitted amount of a lot: "+MarketInfo(Symbol(),MODE_MINLOT));
+   Print("Maximum permitted amount of a lot: "+MarketInfo(Symbol(),MODE_MAXLOT));
+   Print("Step for changing lots: "+MarketInfo(Symbol(),MODE_LOTSTEP));
+   Print("Free margin required to open 1 lot for buying: "+MarketInfo(Symbol(),MODE_MARGINREQUIRED));
    //int delOldGVCount=GlobalVariablesDeleteAll("MPP_");
    //log_info(delOldGVCount+" globalvariables(MPP_) has been deleted.");
    int sumcode = 0;
@@ -101,11 +102,12 @@ int start()
       return(0);
    }
    
-   //trade  only for first tiks of new bar.
-   if(Volume[0]>1)
+   //trade only for first ticket of new bar.
+   if(prevtime == Time[0])
    {
       return(0);
    }
+   prevtime = Time[0];
    
    //check for history and trading
    if(Bars<100 || IsTradeAllowed()==false)
