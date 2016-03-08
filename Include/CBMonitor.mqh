@@ -6,6 +6,7 @@
 #property copyright "ArchestMage"
 #property link      ""
 extern string monitor="GBPJPY240";	//默认只由GBPJPY4H负责邮件发送
+string msgReport="none"; //messages to report generated during trading
 
 int monitor()
 {
@@ -24,11 +25,15 @@ int monitor()
 			 content=content+"\n"+OrderSymbol()+"\t"+OrderLots()+"\t"+OrderProfit();
 		   }
 		}
+		
+		content=content+"\nMessages :";
+		content=content+"\n"+msgReport;
+		
 		log_info(title);
 		if(!SendMail(title,content)){
 			log_err("Send mail failed. The title is :"+title+". The error code is:"+GetLastError());    ;
 		}
+		msgReport="none";
 	}
-
 	return(0);
 }

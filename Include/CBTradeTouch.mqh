@@ -46,9 +46,15 @@ void openTouch(double measure)
    //交易前先刷新价格
    RefreshRates();
    int thisTicket=0;
-
+   int retryCount=0;
    while(true)
    {
+      retryCount=retryCount+1;
+      if(retryCount>10)
+      {
+         log_err("Retry count reach the max, break it.");
+         break;
+      }
       log_info("The request was sent to the server. Waiting for reply...");
       if(measure>0)
       {
@@ -75,10 +81,8 @@ void openTouch(double measure)
                continue;                           // At the next iteration         
             case 136:
                log_err("No prices. Waiting for a new tick..");            
-               while(RefreshRates()==false)        // Up to a new tick               
-                  {
-                     Sleep(1);                        // Cycle delay            
-                  }
+               Sleep(500);                         // Simple solution            
+               RefreshRates();                     // Update data
                continue;                           // At the next iteration         
             case 146:
                log_err("Trading subsystem is busy. Retrying..");            
@@ -110,7 +114,8 @@ void openTouch(double measure)
             default: 
                log_err("Occurred error :"+lastError);// Other alternatives         
                break;
-         }      
+         }
+         break;
       }
    }
 }

@@ -330,11 +330,9 @@ void openMAX(double measure)
                RefreshRates();                     // Update data            
                continue;                           // At the next iteration         
             case 136:
-               log_err("No prices. Waiting for a new tick..");            
-               while(RefreshRates()==false)        // Up to a new tick               
-                  {
-                     Sleep(1);                        // Cycle delay            
-                  }
+               log_err("No prices. Waiting for a new tick..");
+               Sleep(500);                
+               RefreshRates();
                continue;                           // At the next iteration         
             case 146:
                log_err("Trading subsystem is busy. Retrying..");            
@@ -366,7 +364,8 @@ void openMAX(double measure)
             default: 
                log_err("Occurred error :"+lastError);// Other alternatives         
                break;
-         }      
+         }
+         break; // break the loop for critical errors
       }
    }
 }

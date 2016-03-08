@@ -71,8 +71,15 @@ void openMomentum(int momentum)
       }
 
       int thisTicket=0;
+      int retryCount=0;
       while(true)
       {
+         retryCount=retryCount+1;
+         if(retryCount>10)
+         {
+            log_err("Retry count reach the max, break it.");
+            break;
+         }
          //交易前先刷新价格
          RefreshRates();
          double stopLoss=0;
@@ -135,10 +142,8 @@ void openMomentum(int momentum)
                   continue;                           // At the next iteration         
                case 136:
                   log_err("No prices. Waiting for a new tick..");            
-                  while(RefreshRates()==false)        // Up to a new tick               
-                     {
-                        Sleep(1);                        // Cycle delay            
-                     }
+                  Sleep(500);                
+                  RefreshRates();
                   continue;                           // At the next iteration         
                case 146:
                   log_err("Trading subsystem is busy. Retrying..");            
@@ -164,7 +169,8 @@ void openMomentum(int momentum)
                default: 
                   log_err("Occurred error :"+lastError);// Other alternatives         
                   break;
-            }      
+            }
+            break;
          }
       }
    }
