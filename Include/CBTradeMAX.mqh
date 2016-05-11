@@ -13,18 +13,19 @@
 extern int periodFast=80;//快速MA的period
 extern int periodSlow=260;//慢速MA的period
 
-//TODO GBPJPY在(0.0004,0.0005,-0.0001)下表现优越，考虑根据总点数、局部幅度来动态优化其他品种的参数
+//TODO GBPJPY在(0.0004,0.0005,-0.0001)下表现优越，考虑根据局部标准差来动态优化其他品种的参数
 double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
 double minRateFast=0.0005;//fastma必须即时增长0.0005以上
 double minRateSlow=-0.0001;//slowma的即时增长必须大于-0.0001  似乎这个影响
 
+//TODO important:以较长时间当前时间粒度(比如最近1000个点)的价格标准差为基准计算，以便不同时间粒度上的移植
 double minDistSL=200*Point;
 double maxDistSL=2000*Point;
 
 extern double lotSpecify=0.02;//指定手，开固定的大小
 int exemptNumClose=0;//豁免在交叉后强制close的机会数。豁免权在开仓后，maslow与mafast交叉或重合后有机会获取。该属性只属于已有仓位。每bar自动减1。
 int lastUpdownStatus=0;//上一bar的fast与slow MA的相对位置
-double stdDev=0; //价格波动的方差
+double atr=0; 
 void tradeMAX()
 {
    /*
@@ -52,22 +53,7 @@ void tradeMAX()
    int posLiveTime = getPosLiveTime();//该货币对已有仓位的存在时间，0表示无仓位
    int posType=getPosType();//该货币对已有仓位的类别
    
-   //double devDown=0;//最近periodSlow内价格下跌的方差
-   //for(int i=0;i<periodSlow;i++)
-   //{
-   //   devDown=devDown+(Open[i]-Low[i])*(Open[i]-Low[i]);
-   //}
-   //devDown=devDown/periodSlow;
-   //double stdDevDown=MathSqrt(devDown);
-   stdDev=iStdDev(NULL,0,26,0,MODE_LWMA,PRICE_MEDIAN,0);
-   
-   //double devUp=0;//最近periodSlow内价格上涨的方差
-   //for(int j=0;j<periodSlow;j++)
-   //{
-   //   devUp=devUp+(Open[j]-High[j])*(Open[j]-High[j]);
-   //}
-   //devUp=devUp/periodSlow;
-   //double stdDevUp=MathSqrt(devUp);
+   atr=iATR(NULL,0,periodSlow,0);
    
    if(maFast>(maSlow+maDiff))
    {
@@ -92,16 +78,16 @@ void tradeMAX()
          {
             if(posLiveTime>(3*MathMax(5,periodFast)*Period()*60))
             {
-               modifyStopLoseMAX(MathMax(1*stdDev,MathAbs(maSlow-Ask)));
+               modifyStopLoseMAX(MathMax(1*atr,MathAbs(maSlow-Ask)));
             }else if(posLiveTime>(2*MathMax(5,periodFast)*Period()*60))
             {
-               modifyStopLoseMAX(MathMax(1.5*stdDev,MathAbs(maSlow-Ask)));
+               modifyStopLoseMAX(MathMax(1.5*atr,MathAbs(maSlow-Ask)));
             }else if(posLiveTime>(MathMax(5,periodFast)*Period()*60))
             {
-               modifyStopLoseMAX(MathMax(2*stdDev,MathAbs(maSlow-Ask)));
+               modifyStopLoseMAX(MathMax(2*atr,MathAbs(maSlow-Ask)));
             }else
             {
-               modifyStopLoseMAX(MathMax(3*stdDev,MathAbs(maSlow-Ask)));
+               modifyStopLoseMAX(MathMax(3*atr,MathAbs(maSlow-Ask)));
             }
          }
       }else if(posLiveTime==0)
@@ -139,16 +125,16 @@ void tradeMAX()
          {
             if(posLiveTime>(3*MathMax(5,periodFast)*Period()*60))
             {
-               modifyStopLoseMAX(MathMax(1*stdDev,MathAbs(maSlow-Bid)));
+               modifyStopLoseMAX(MathMax(1*atr,MathAbs(maSlow-Bid)));
             }else if(posLiveTime>(2*MathMax(5,periodFast)*Period()*60))
             {
-               modifyStopLoseMAX(MathMax(1.5*stdDev,MathAbs(maSlow-Bid)));
+               modifyStopLoseMAX(MathMax(1.5*atr,MathAbs(maSlow-Bid)));
             }else if(posLiveTime>(MathMax(5,periodFast)*Period()*60))
             {
-               modifyStopLoseMAX(MathMax(2*stdDev,MathAbs(maSlow-Bid)));
+               modifyStopLoseMAX(MathMax(2*atr,MathAbs(maSlow-Bid)));
             }else
             {
-               modifyStopLoseMAX(MathMax(3*stdDev,MathAbs(maSlow-Bid)));
+               modifyStopLoseMAX(MathMax(3*atr,MathAbs(maSlow-Bid)));
             }
          }
       }else if(posLiveTime==0)
@@ -286,17 +272,17 @@ void openMAX(double measure)
    RefreshRates();
    int thisTicket=0;
    double distSLOpen=0;
-   if((3*stdDev)>maxDistSL)
+   if((3*atr)>maxDistSL)
    {
       distSLOpen=maxDistSL;
    }else{
-      distSLOpen=3*stdDev;
+      distSLOpen=3*atr;
    }
-   if((3*stdDev)<minDistSL)
+   if((3*atr)<minDistSL)
    {
       distSLOpen=minDistSL;
    }else{
-      distSLOpen=3*stdDev;
+      distSLOpen=3*atr;
    }
    int retryCount=0;
    while(true)
