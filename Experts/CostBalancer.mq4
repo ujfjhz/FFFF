@@ -15,10 +15,11 @@
 #include <CBTradeTouch.mqh>
 #include <CBTradeTrend.mqh>
 #include <CBTradeCutail.mqh>
+#include <CBJinGangJing.mqh>
 
 bool isTickStart=true;//全局控制是否在tick来临时开始自动处理
 extern string stratedy="true";//交易策略。有如下选择：cutail,trend,inertia.默认为cutail收割利润尾巴；trend为按趋势交易；inertia为惯性策略。
-string cbVersion="1.0-160308";//version
+string cbVersion="1.0-160515";//version
 int MAGICNUMBER=0;//用于同品种在不同的策略或者在不同的图上能独立运行
 datetime prevtime=0; //the time of bar which before the just coming ticket. the new ticket can form a new bar or just add to the old bar.
 
@@ -27,12 +28,13 @@ datetime prevtime=0; //the time of bar which before the just coming ticket. the 
 //+------------------------------------------------------------------+
 int init()
   {
-   Print("CostBalancer-"+cbVersion+" start running for "+Symbol()+"....");
-   Print("Lot size in the base currency: "+MarketInfo(Symbol(),MODE_LOTSIZE));
-   Print("Minimum permitted amount of a lot: "+MarketInfo(Symbol(),MODE_MINLOT));
-   Print("Maximum permitted amount of a lot: "+MarketInfo(Symbol(),MODE_MAXLOT));
-   Print("Step for changing lots: "+MarketInfo(Symbol(),MODE_LOTSTEP));
-   Print("Free margin required to open 1 lot for buying: "+MarketInfo(Symbol(),MODE_MARGINREQUIRED));
+   log_info("CostBalancer-"+cbVersion+" start running for "+Symbol()+"....");
+   bless();
+   log_info("Lot size in the base currency: "+MarketInfo(Symbol(),MODE_LOTSIZE));
+   log_info("Minimum permitted amount of a lot: "+MarketInfo(Symbol(),MODE_MINLOT));
+   log_info("Maximum permitted amount of a lot: "+MarketInfo(Symbol(),MODE_MAXLOT));
+   log_info("Step for changing lots: "+MarketInfo(Symbol(),MODE_LOTSTEP));
+   log_info("Free margin required to open 1 lot for buying: "+MarketInfo(Symbol(),MODE_MARGINREQUIRED));
    //int delOldGVCount=GlobalVariablesDeleteAll("MPP_");
    //log_info(delOldGVCount+" globalvariables(MPP_) has been deleted.");
    int sumcode = 0;

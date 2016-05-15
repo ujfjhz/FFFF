@@ -55,6 +55,8 @@ public:
    bool              Selected(const bool new_sel) const;
    bool              Selectable(void) const;
    bool              Selectable(const bool new_sel) const;
+   bool              Hidden(void) const;
+   bool              Hidden(const bool new_sel) const;
    string            Description(void) const;
    bool              Description(const string new_text) const;
    string            Tooltip(void) const;
@@ -410,6 +412,28 @@ bool CChartObject::Selectable(const bool new_sel) const
       return(false);
 //--- result
    return(ObjectSetInteger(m_chart_id,m_name,OBJPROP_SELECTABLE,new_sel));
+  }
+//+------------------------------------------------------------------+
+//| Get the "hidden" flag                                            |
+//+------------------------------------------------------------------+
+bool CChartObject::Hidden(void) const
+  {
+//--- check
+   if(m_chart_id==-1)
+      return(false);
+//--- result
+   return(ObjectGetInteger(m_chart_id,m_name,OBJPROP_HIDDEN));
+  }
+//+------------------------------------------------------------------+
+//| Set flag the "hidden" flag                                       |
+//+------------------------------------------------------------------+
+bool CChartObject::Hidden(const bool new_sel) const
+  {
+//--- check
+   if(m_chart_id==-1)
+      return(false);
+//--- result
+   return(ObjectSetInteger(m_chart_id,m_name,OBJPROP_HIDDEN,new_sel));
   }
 //+------------------------------------------------------------------+
 //| Get comment of object                                            |
@@ -858,6 +882,9 @@ bool CChartObject::Save(const int file_handle)
 //--- write the property value "Selectable"
    if(FileWriteInteger(file_handle,(int)ObjectGetInteger(m_chart_id,m_name,OBJPROP_SELECTABLE),CHAR_VALUE)!=sizeof(char))
       return(false);
+//--- write the property value "Hidden"
+   if(FileWriteInteger(file_handle,(int)ObjectGetInteger(m_chart_id,m_name,OBJPROP_HIDDEN),CHAR_VALUE)!=sizeof(char))
+      return(false);
 //--- write the property value "Timeframes"
    if(FileWriteInteger(file_handle,(int)ObjectGetInteger(m_chart_id,m_name,OBJPROP_TIMEFRAMES),INT_VALUE)!=sizeof(int))
       return(false);
@@ -944,6 +971,9 @@ bool CChartObject::Load(const int file_handle)
       return(false);
 //--- read the property value "Selectable"
    if(!ObjectSetInteger(m_chart_id,m_name,OBJPROP_SELECTABLE,FileReadInteger(file_handle,CHAR_VALUE)))
+      return(false);
+//--- read the property value "Hidden"
+   if(!ObjectSetInteger(m_chart_id,m_name,OBJPROP_HIDDEN,FileReadInteger(file_handle,CHAR_VALUE)))
       return(false);
 //--- read the property value "Timeframes"
    if(!ObjectSetInteger(m_chart_id,m_name,OBJPROP_TIMEFRAMES,FileReadInteger(file_handle,INT_VALUE)))

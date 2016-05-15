@@ -54,6 +54,8 @@ bool CChartObjectGannLine::Create(long chart_id,const string name,const int wind
       return(false);
    if(!PipsPerBar(ppb))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -163,6 +165,8 @@ bool CChartObjectGannFan::Create(long chart_id,const string name,const int windo
       return(false);
    if(!PipsPerBar(ppb))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -300,6 +304,8 @@ bool CChartObjectGannGrid::Create(long chart_id,const string name,const int wind
       return(false);
    if(!PipsPerBar(ppb))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }

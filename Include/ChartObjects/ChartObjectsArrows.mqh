@@ -54,6 +54,8 @@ bool CChartObjectArrow::Create(long chart_id,const string name,const int window,
       return(false);
    if(!ArrowCode(code))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -178,6 +180,8 @@ bool CChartObjectArrowThumbUp::Create(long chart_id,const string name,const int 
       return(false);
    if(!Attach(chart_id,name,window,1))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -221,6 +225,8 @@ bool CChartObjectArrowThumbDown::Create(long chart_id,const string name,const in
       return(false);
    if(!Attach(chart_id,name,window,1))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -264,6 +270,8 @@ bool CChartObjectArrowUp::Create(long chart_id,const string name,const int windo
       return(false);
    if(!Attach(chart_id,name,window,1))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -307,6 +315,8 @@ bool CChartObjectArrowDown::Create(long chart_id,const string name,const int win
       return(false);
    if(!Attach(chart_id,name,window,1))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -350,6 +360,8 @@ bool CChartObjectArrowStop::Create(long chart_id,const string name,const int win
       return(false);
    if(!Attach(chart_id,name,window,1))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -393,6 +405,8 @@ bool CChartObjectArrowCheck::Create(long chart_id,const string name,const int wi
       return(false);
    if(!Attach(chart_id,name,window,1))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -436,6 +450,8 @@ bool CChartObjectArrowLeftPrice::Create(long chart_id,const string name,const in
       return(false);
    if(!Attach(chart_id,name,window,1))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -480,6 +496,8 @@ bool CChartObjectArrowRightPrice::Create(long chart_id,const string name,const i
       return(false);
    if(!Attach(chart_id,name,window,1))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }

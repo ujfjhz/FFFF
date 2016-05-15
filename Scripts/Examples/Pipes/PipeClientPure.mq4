@@ -16,7 +16,7 @@ int ExtPipe=-1;
 void OnStart()
   {
    string str_client="PipeClient on MQL4 build "+IntegerToString(__MQL4BUILD__);
-   int    size_str=StringLen(str_client);
+   uint   size_str=StringLen(str_client);
 //--- wait for pipe server
    bool bfirst=true;
    while(!IsStopped())
@@ -89,7 +89,7 @@ void OnStart()
 //---
    double buffer[];
    double volume=0.0;
-   int    array_size=1024*1024;
+   uint   array_size=1024*1024;
 
    if(ArrayResize(buffer,array_size)==array_size)
      {

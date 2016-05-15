@@ -77,7 +77,7 @@ void CFile::SetUnicode(const bool unicode)
       if(unicode)
          m_flags|=FILE_UNICODE;
       else
-         m_flags^=FILE_UNICODE;
+         m_flags&=~FILE_UNICODE;
      }
   }
 //+------------------------------------------------------------------+
@@ -91,7 +91,7 @@ void CFile::SetCommon(const bool common)
       if(common)
          m_flags|=FILE_COMMON;
       else
-         m_flags^=FILE_COMMON;
+         m_flags&=~FILE_COMMON;
      }
   }
 //+------------------------------------------------------------------+

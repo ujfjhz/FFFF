@@ -1,9 +1,9 @@
 //+------------------------------------------------------------------+
 //|                                       Custom Moving Averages.mq4 |
-//|                   Copyright 2005-2014, MetaQuotes Software Corp. |
+//|                   Copyright 2005-2015, MetaQuotes Software Corp. |
 //|                                              http://www.mql4.com |
 //+------------------------------------------------------------------+
-#property copyright   "2005-2014, MetaQuotes Software Corp."
+#property copyright   "2005-2015, MetaQuotes Software Corp."
 #property link        "http://www.mql4.com"
 #property description "Moving Average"
 #property strict
@@ -145,7 +145,7 @@ void CalculateLWMA(int rates_total,int prev_calculated,const double &price[])
       double firstValue=0;
       for(i=0;i<limit;i++)
         {
-         int k=i-1;
+         int k=i+1;
          weightsum+=k;
          firstValue+=k*price[i];
         }

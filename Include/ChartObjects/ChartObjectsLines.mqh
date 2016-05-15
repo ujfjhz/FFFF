@@ -42,6 +42,8 @@ bool CChartObjectVLine::Create(long chart_id,const string name,const int window,
       return(false);
    if(!Attach(chart_id,name,window,1))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -81,6 +83,8 @@ bool CChartObjectHLine::Create(long chart_id,const string name,const int window,
       return(false);
    if(!Attach(chart_id,name,window,1))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -134,6 +138,8 @@ bool CChartObjectTrend::Create(long chart_id,const string name,const int window,
       return(false);
    if(!Attach(chart_id,name,window,2))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -264,6 +270,8 @@ bool CChartObjectTrendByAngle::Create(long chart_id,const string name,const int 
       return(false);
    if(!Attach(chart_id,name,window,2))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -329,6 +337,8 @@ bool CChartObjectCycles::Create(long chart_id,const string name,const int window
       return(false);
    if(!Attach(chart_id,name,window,2))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }

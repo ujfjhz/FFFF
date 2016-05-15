@@ -56,6 +56,8 @@ bool CChartObjectText::Create(long chart_id,const string name,const int window,
       return(false);
    if(!Attach(chart_id,name,window,1))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -264,6 +266,8 @@ bool CChartObjectLabel::Create(long chart_id,const string name,const int window,
       return(false);
    if(!X_Distance(X) || !Y_Distance(Y))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -459,6 +463,8 @@ bool CChartObjectEdit::Create(long chart_id,const string name,const int window,c
       return(false);
    if(!X_Size(sizeX) || !Y_Size(sizeY))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -761,6 +767,8 @@ bool CChartObjectRectLabel::Create(long chart_id,const string name,const int win
       return(false);
    if(!X_Size(sizeX) || !Y_Size(sizeY))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }

@@ -48,6 +48,8 @@ bool CChartObjectChannel::Create(long chart_id,const string name,const int windo
       return(false);
    if(!Attach(chart_id,name,window,3))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -98,6 +100,8 @@ bool CChartObjectStdDevChannel::Create(long chart_id,const string name,const int
       return(false);
    if(!Deviations(deviation))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -195,6 +199,8 @@ bool CChartObjectRegression::Create(long chart_id,const string name,const int wi
       return(false);
    if(!Attach(chart_id,name,window,2))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -240,6 +246,8 @@ bool CChartObjectPitchfork::Create(long chart_id,const string name,const int win
       return(false);
    if(!Attach(chart_id,name,window,3))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }

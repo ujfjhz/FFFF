@@ -9,36 +9,26 @@
 //基于快速MA慢速MA的交叉进行交易
 //以简单的规则进行交易。若无单，凡快速MA高于慢速MA则做多，反之做空。只做SL修改，不设TP。
 //MAX追求利润最大化
+//for 4H only
 
+//TODO 自适应
 extern int periodFast=80;//快速MA的period
 extern int periodSlow=260;//慢速MA的period
 
-//TODO GBPJPY在(0.0004,0.0005,-0.0001)下表现优越，考虑根据局部标准差来动态优化其他品种的参数
 double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么粗略的认为他们是相等的
 double minRateFast=0.0005;//fastma必须即时增长0.0005以上
 double minRateSlow=-0.0001;//slowma的即时增长必须大于-0.0001  似乎这个影响
 
-//TODO important:以较长时间当前时间粒度(比如最近1000个点)的价格标准差为基准计算，以便不同时间粒度上的移植
 double minDistSL=200*Point;
 double maxDistSL=2000*Point;
 
 extern double lotSpecify=0.02;//指定手，开固定的大小
 int exemptNumClose=0;//豁免在交叉后强制close的机会数。豁免权在开仓后，maslow与mafast交叉或重合后有机会获取。该属性只属于已有仓位。每bar自动减1。
 int lastUpdownStatus=0;//上一bar的fast与slow MA的相对位置
-double atr=0; 
+double atrDist=0; //基于atr的stop loss distance
+extern double atrFactor = 1;    //stop loss distance = atr * atrFactor
 void tradeMAX()
 {
-   /*
-   //基于GBPJPY的规范化
-   double maYear=iMA(NULL,PERIOD_D1,360,0,MODE_LWMA,PRICE_OPEN,0);    
-   double paramFactor=1;
-   if(maYear!=0){
-      paramFactor=MathPow(10,(21500*10)/(maYear/Point)-1);
-   }
-   maDiff=40*Point*paramFactor/100;
-   minRateFast=50*Point*paramFactor/100;
-   minRateSlow=-10*Point*paramFactor/100;
-   */
 
    //this bar
    double maFast=iMA(NULL,0,periodFast,0,MODE_LWMA,PRICE_OPEN,0);    
@@ -53,7 +43,12 @@ void tradeMAX()
    int posLiveTime = getPosLiveTime();//该货币对已有仓位的存在时间，0表示无仓位
    int posType=getPosType();//该货币对已有仓位的类别
    
-   atr=iATR(NULL,0,periodSlow,0);
+   double atr = iATR(NULL,0,periodSlow,0);
+   atrDist=atr*atrFactor;
+
+   maDiff=(0.001)*atr;
+   minRateFast=(0.001)*atr;
+   minRateSlow=(-0.0005)*atr;
    
    if(maFast>(maSlow+maDiff))
    {
@@ -78,16 +73,16 @@ void tradeMAX()
          {
             if(posLiveTime>(3*MathMax(5,periodFast)*Period()*60))
             {
-               modifyStopLoseMAX(MathMax(1*atr,MathAbs(maSlow-Ask)));
+               modifyStopLoseMAX(MathMax(1*atrDist,MathAbs(maSlow-Ask)));
             }else if(posLiveTime>(2*MathMax(5,periodFast)*Period()*60))
             {
-               modifyStopLoseMAX(MathMax(1.5*atr,MathAbs(maSlow-Ask)));
+               modifyStopLoseMAX(MathMax(1.5*atrDist,MathAbs(maSlow-Ask)));
             }else if(posLiveTime>(MathMax(5,periodFast)*Period()*60))
             {
-               modifyStopLoseMAX(MathMax(2*atr,MathAbs(maSlow-Ask)));
+               modifyStopLoseMAX(MathMax(2*atrDist,MathAbs(maSlow-Ask)));
             }else
             {
-               modifyStopLoseMAX(MathMax(3*atr,MathAbs(maSlow-Ask)));
+               modifyStopLoseMAX(MathMax(3*atrDist,MathAbs(maSlow-Ask)));
             }
          }
       }else if(posLiveTime==0)
@@ -125,16 +120,16 @@ void tradeMAX()
          {
             if(posLiveTime>(3*MathMax(5,periodFast)*Period()*60))
             {
-               modifyStopLoseMAX(MathMax(1*atr,MathAbs(maSlow-Bid)));
+               modifyStopLoseMAX(MathMax(1*atrDist,MathAbs(maSlow-Bid)));
             }else if(posLiveTime>(2*MathMax(5,periodFast)*Period()*60))
             {
-               modifyStopLoseMAX(MathMax(1.5*atr,MathAbs(maSlow-Bid)));
+               modifyStopLoseMAX(MathMax(1.5*atrDist,MathAbs(maSlow-Bid)));
             }else if(posLiveTime>(MathMax(5,periodFast)*Period()*60))
             {
-               modifyStopLoseMAX(MathMax(2*atr,MathAbs(maSlow-Bid)));
+               modifyStopLoseMAX(MathMax(2*atrDist,MathAbs(maSlow-Bid)));
             }else
             {
-               modifyStopLoseMAX(MathMax(3*atr,MathAbs(maSlow-Bid)));
+               modifyStopLoseMAX(MathMax(3*atrDist,MathAbs(maSlow-Bid)));
             }
          }
       }else if(posLiveTime==0)
@@ -194,30 +189,6 @@ void modifyStopLoseMAX(double distSL)
             continue;
          }
          
-         /*
-         相对MAXPROFIT的止损策略与一般止损策略逻辑上不协调，并且测试效果非常差，取消之。
-         //get the max profit return price
-         maxProfitPoint=getMaxProfitPoint();
-         //只有在总盈利超过特定值才更新maxReturnPrice
-         if(maxProfitPoint>10000)
-         {
-            maxReturnPrice=maxProfitPoint*Point/5;
-         }else if(maxProfitPoint>7000)
-         {
-            maxReturnPrice=maxProfitPoint*Point/4;
-         }else if(maxProfitPoint>4500)
-         {
-            maxReturnPrice=maxProfitPoint*Point/3;
-         }else if(maxProfitPoint>2500)
-         {
-            maxReturnPrice=maxProfitPoint*Point/2;
-         }
-        
-         if(distSL>maxReturnPrice && maxProfitPoint>2500){//只针对有足够盈利的仓位进行止损优化
-            distSL=maxReturnPrice;
-         }
-         */
-         
          if(distSL<minDistSL){
             distSL=minDistSL;
          }
@@ -272,17 +243,17 @@ void openMAX(double measure)
    RefreshRates();
    int thisTicket=0;
    double distSLOpen=0;
-   if((3*atr)>maxDistSL)
+   if((3*atrDist)>maxDistSL)
    {
       distSLOpen=maxDistSL;
    }else{
-      distSLOpen=3*atr;
+      distSLOpen=3*atrDist;
    }
-   if((3*atr)<minDistSL)
+   if((3*atrDist)<minDistSL)
    {
       distSLOpen=minDistSL;
    }else{
-      distSLOpen=3*atr;
+      distSLOpen=3*atrDist;
    }
    int retryCount=0;
    while(true)

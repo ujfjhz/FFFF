@@ -31,13 +31,13 @@ public:
    bool              Border(const int value);
    bool              BmpNames(const string off="",const string on="");
    string            BmpOffName(void)      const { return(m_bmp_off_name);             }
-   bool              BmpOffName(const string name="");
+   bool              BmpOffName(const string name);
    string            BmpOnName(void)       const { return(m_bmp_on_name);              }
-   bool              BmpOnName(const string name="");
+   bool              BmpOnName(const string name);
    string            BmpPassiveName(void)  const { return(m_bmp_passive_name);         }
-   bool              BmpPassiveName(const string name="");
+   bool              BmpPassiveName(const string name);
    string            BmpActiveName(void)   const { return(m_bmp_active_name);          }
-   bool              BmpActiveName(const string name="");
+   bool              BmpActiveName(const string name);
    //--- state
    bool              Pressed(void)         const { return(m_button.State());           }
    bool              Pressed(const bool pressed) { return(m_button.State(pressed));    }

@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                   RadioGroup.mqh |
-//|                   Copyright 2009-2013, MetaQuotes Software Corp. |
+//|                   Copyright 2009-2015, MetaQuotes Software Corp. |
 //|                                              http://www.mql5.com |
 //+------------------------------------------------------------------+
 #include "WndClient.mqh"
@@ -41,6 +41,7 @@ public:
    bool              ValueCheck(long value) const;
    //--- state
    virtual bool      Show(void);
+   void              RedrawButtonStates(void);
    //--- methods for working with files
    virtual bool      Save(const int file_handle);
    virtual bool      Load(const int file_handle);
@@ -154,7 +155,7 @@ bool CRadioGroup::AddItem(const string item,const long value)
 //--- number of items
    int total=m_strings.Total();
 //--- exit if number of items does not exceed the size of visible area
-   if(total<m_total_view+1)
+   if(total<=m_total_view)
      {
       if(IS_VISIBLE && total!=0)
          m_rows[total-1].Show();
@@ -261,6 +262,21 @@ void CRadioGroup::Select(const int index)
    m_current=index;
   }
 //+------------------------------------------------------------------+
+//| Redraw visible buttons                                           |
+//+------------------------------------------------------------------+
+void CRadioGroup::RedrawButtonStates(void)
+  {
+//--- loop by "rows"
+   for(int i=0;i<m_total_view;i++)
+     {
+      if(i>=ArraySize(m_rows))
+         break;
+      //--- select/unselect
+      m_rows[i].State(m_current==i+m_offset);
+     }
+//---
+  }
+//+------------------------------------------------------------------+
 //| Redraw                                                           |
 //+------------------------------------------------------------------+
 bool CRadioGroup::Redraw(void)
@@ -268,11 +284,13 @@ bool CRadioGroup::Redraw(void)
 //--- loop by "rows"
    for(int i=0;i<m_total_view;i++)
      {
+      if(i>=ArraySize(m_rows))
+         break;
       //--- copy text
       if(!m_rows[i].Text(m_strings.At(i+m_offset)))
          return(false);
       //--- select
-      if(!RowState(i,(m_current==i+m_offset)))
+      if(!m_rows[i].State(m_current==i+m_offset))
          return(false);
      }
 //--- succeed

@@ -46,6 +46,8 @@ bool CChartObjectFibo::Create(long chart_id,const string name,const int window,
       return(false);
    if(!Attach(chart_id,name,window,2))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -89,6 +91,8 @@ bool CChartObjectFiboTimes::Create(long chart_id,const string name,const int win
       return(false);
    if(!Attach(chart_id,name,window,2))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -132,6 +136,8 @@ bool CChartObjectFiboFan::Create(long chart_id,const string name,const int windo
       return(false);
    if(!Attach(chart_id,name,window,2))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -185,6 +191,8 @@ bool CChartObjectFiboArc::Create(long chart_id,const string name,const int windo
       return(false);
    if(!Scale(scale))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -314,6 +322,8 @@ bool CChartObjectFiboChannel::Create(long chart_id,const string name,const int w
       return(false);
    if(!Attach(chart_id,name,window,3))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }
@@ -359,6 +369,8 @@ bool CChartObjectFiboExpansion::Create(long chart_id,const string name,const int
       return(false);
    if(!Attach(chart_id,name,window,3))
       return(false);
+   Selectable(false);
+   Hidden(true);
 //--- successful
    return(true);
   }

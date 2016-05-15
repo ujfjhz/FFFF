@@ -1,9 +1,9 @@
 //+------------------------------------------------------------------+
 //|                                                       stdlib.mq4 |
-//|                   Copyright 2005-2014, MetaQuotes Software Corp. |
+//|                   Copyright 2005-2015, MetaQuotes Software Corp. |
 //|                                              http://www.mql4.com |
 //+------------------------------------------------------------------+
-#property copyright "2005-2014, MetaQuotes Software Corp."
+#property copyright "2005-2015, MetaQuotes Software Corp."
 #property link      "http://www.mql4.com"
 #property library
 //+------------------------------------------------------------------+
@@ -16,8 +16,8 @@ string ErrorDescription(int error_code)
    switch(error_code)
      {
       //--- codes returned from trade server
-      case 0:
-      case 1:   error_string="no error";                                                   break;
+      case 0:   error_string="no error";                                                   break;
+      case 1:   error_string="no error, trade conditions not changed";                     break;
       case 2:   error_string="common error";                                               break;
       case 3:   error_string="invalid trade parameters";                                   break;
       case 4:   error_string="trade server is busy";                                       break;
@@ -101,7 +101,11 @@ string ErrorDescription(int error_code)
       case 4068: error_string="resource not found";                                        break;
       case 4069: error_string="resource not supported";                                    break;
       case 4070: error_string="duplicate resource";                                        break;
-      case 4071: error_string="custom indicator cannot initialize";                        break;
+      case 4071: error_string="cannot initialize custom indicator";                        break;
+      case 4072: error_string="cannot load custom indicator";                              break;
+      case 4073: error_string="no history data";                                           break;
+      case 4074: error_string="not enough memory for history data";                        break;
+      case 4075: error_string="not enough memory for indicator";                           break;
       case 4099: error_string="end of file";                                               break;
       case 4100: error_string="some file error";                                           break;
       case 4101: error_string="wrong file name";                                           break;
@@ -132,6 +136,13 @@ string ErrorDescription(int error_code)
       case 4251: error_string="notification parameter error";                              break;
       case 4252: error_string="notifications disabled";                                    break;
       case 4253: error_string="notification send too frequent";                            break;
+      case 4260: error_string="ftp server is not specified";                               break;
+      case 4261: error_string="ftp login is not specified";                                break;
+      case 4262: error_string="ftp connect failed";                                        break;
+      case 4263: error_string="ftp connect closed";                                        break;
+      case 4264: error_string="ftp change path error";                                     break;
+      case 4265: error_string="ftp file error";                                            break;
+      case 4266: error_string="ftp error";                                                 break;
       case 5001: error_string="too many opened files";                                     break;
       case 5002: error_string="wrong file name";                                           break;
       case 5003: error_string="too long file name";                                        break;
