@@ -1,29 +1,32 @@
 1) Editor
    scite-mql-1.4.2
+   set help:
+   (i)  start scite
+   (ii) Open Options->mql.properties
+command.help.$(file.patterns.mql)=$(CurrentWord)!$(SciteDefaultHome)\docs\mql.chm
+command.help.subsystem.$(file.patterns.mql)=4
 
 2) compiler
-   scite-mql-1.4.2 didn't support the new MT4(600+), and you can
-   download the "MQL4/MQL5 Compiler" seperately from the MT4 package
-	http://files.metaquotes.net/metaquotes.software.corp/mt5/mql.exe 
-	32 bit version.
-	http://files.metaquotes.net/metaquotes.software.corp/mt5/mql64.exe 
-	64 bit version.
+   metaeditor.exe
 
-3) config
+
+
+Recommend to edit in scite-mql, and compile it in metaeditor. Since "metaeditor.exe /compile" always return
+success, don't compile in scite.
+But if metaeditor is fixed in the future, we can use it as compiler in scite:
    (i)  start scite
    (ii) Open Options->mql.properties
    (iii)set metalang to the path of the compiler and following variables like "command.compile",etc
-
-
 The following is ok£º
-compiler=$(SciteDefaultHome)\other\compile.bat
-metalang=$(SciteDefaultHome)\..\mqlcompiler.exe
-command.go.$(file.patterns.mql)="$(compiler)" "$(FilePath)" "$(SciteDefaultHome)" $(1) $(2) $(3) $(4)
+#compiler=$(SciteDefaultHome)\other\compile.bat
+metalang=$(SciteDefaultHome)\..\metaeditor.exe
+#command.go.$(file.patterns.mql)="$(compiler)" "$(FilePath)" "$(SciteDefaultHome)" $(1) $(2) $(3) $(4)
 command.go.subsystem.$(file.patterns.mql)=0
-command.compile.$(file.patterns.mql)=$(metalang) "$(FilePath)"
+command.compile.$(file.patterns.mql)=$(metalang) /compile: "$(FilePath)"
 command.compile.filter.$(file.patterns.mql)=1
-command.build.$(file.patterns.mql)=$(metalang) "$(FilePath)"
+command.build.$(file.patterns.mql)=$(metalang) /compile: "$(FilePath)"
 command.build.filter.$(file.patterns.mql)=1
 
-command.help.$(file.patterns.mql)=$(CurrentWord)!$(SciteDefaultHome)\docs\mql.chm
-command.help.subsystem.$(file.patterns.mql)=4
+
+And, the former seperate compiler mql.exe had been decrecated.
+

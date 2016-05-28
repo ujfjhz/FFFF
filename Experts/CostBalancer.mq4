@@ -37,6 +37,7 @@ int init()
    log_info("Free margin required to open 1 lot for buying: "+MarketInfo(Symbol(),MODE_MARGINREQUIRED));
    //int delOldGVCount=GlobalVariablesDeleteAll("MPP_");
    //log_info(delOldGVCount+" globalvariables(MPP_) has been deleted.");
+   //kdfkdkfd
    int sumcode = 0;
    for (int i=0; i<StringLen(formula); i++)
    {
@@ -168,6 +169,9 @@ int start()
    
    //monitor
    monitor();
+   
+   //update profile
+   updateProfile();
 
    return(0);
   }

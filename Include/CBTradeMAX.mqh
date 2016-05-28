@@ -19,14 +19,28 @@ double maDiff=0.0004;//如果maFast与maSlow之间的距离小于该值，那么
 double minRateFast=0.0005;//fastma必须即时增长0.0005以上
 double minRateSlow=-0.0001;//slowma的即时增长必须大于-0.0001  似乎这个影响
 
-double minDistSL=200*Point;
-double maxDistSL=2000*Point;
+double minDistSL=100*Point;
+double maxDistSL=3000*Point;
 
-extern double lotSpecify=0.02;//指定手，开固定的大小
 int exemptNumClose=0;//豁免在交叉后强制close的机会数。豁免权在开仓后，maslow与mafast交叉或重合后有机会获取。该属性只属于已有仓位。每bar自动减1。
 int lastUpdownStatus=0;//上一bar的fast与slow MA的相对位置
 double atrDist=0; //基于atr的stop loss distance
-extern double atrFactor = 1;    //stop loss distance = atr * atrFactor
+double atrFactor = 3;    //stop loss distance = atr * atrFactor
+
+//calculate standard dev of atr
+double calculateAtrStdDev(int period, double atr)
+{
+   double atrDev = 0;
+   double tmpTR = 0;
+   for(int i=0;i<period;i++)
+   {
+      tmpTR = MathMax(MathMax(MathAbs(High[i]-Low[i]),MathAbs(Close[i+1]-High[i])),MathAbs(Close[i+1]-Low[i]));
+      atrDev=atrDev+(tmpTR-atr)*(tmpTR-atr);
+   }
+   atrDev = atrDev/(period-1);
+   return(MathSqrt(atrDev));
+}
+
 void tradeMAX()
 {
 
@@ -44,7 +58,9 @@ void tradeMAX()
    int posType=getPosType();//该货币对已有仓位的类别
    
    double atr = iATR(NULL,0,periodSlow,0);
-   atrDist=atr*atrFactor;
+   
+   //atrDist=atr*atrFactor;   // atr stop.  have the simular performance with atr dev stop.
+   atrDist=atr+3.25*calculateAtrStdDev(periodSlow,atr);   // atr dev stop
 
    maDiff=(0.001)*atr;
    minRateFast=(0.001)*atr;
@@ -71,6 +87,7 @@ void tradeMAX()
             }
          }else if(posType>0)
          {
+         /* set stop loss for every period
             if(posLiveTime>(3*MathMax(5,periodFast)*Period()*60))
             {
                modifyStopLoseMAX(MathMax(1*atrDist,MathAbs(maSlow-Ask)));
@@ -84,6 +101,10 @@ void tradeMAX()
             {
                modifyStopLoseMAX(MathMax(3*atrDist,MathAbs(maSlow-Ask)));
             }
+            */
+            
+            //set stop loss simply
+            modifyStopLoseMAX(atrDist);
          }
       }else if(posLiveTime==0)
       {
@@ -118,6 +139,7 @@ void tradeMAX()
             }
          }else if(posType<0)
          {
+         /*
             if(posLiveTime>(3*MathMax(5,periodFast)*Period()*60))
             {
                modifyStopLoseMAX(MathMax(1*atrDist,MathAbs(maSlow-Bid)));
@@ -131,6 +153,8 @@ void tradeMAX()
             {
                modifyStopLoseMAX(MathMax(3*atrDist,MathAbs(maSlow-Bid)));
             }
+            */
+            modifyStopLoseMAX(atrDist);
          }
       }else if(posLiveTime==0)
       {
@@ -170,16 +194,16 @@ void tradeMAX()
    }
 }
 
-
 //根据stoplose distance修改stoplose (保持单调性)
 void modifyStopLoseMAX(double distSL)
 {
    //set the maxreturn profit
    //double maxReturnPrice = 3000*Point;
+   double profitPoints=0;
+   double profitRelRNum=0;
    
    int total=OrdersTotal();
    double newSL=0;
-   //double maxProfitPoint=0;
    for(int pos=0;pos<total;pos++)
    {
       if(OrderSelect(pos,SELECT_BY_POS)==true)
@@ -187,6 +211,25 @@ void modifyStopLoseMAX(double distSL)
          if(OrderSymbol() !=Symbol()  || OrderMagicNumber()!=MAGICNUMBER)// Don't handle other symbols and other timeframes and other stratedy.
          {
             continue;
+         }
+         
+         //profit back stoploss check
+         profitRelRNum=OrderProfit()/(OrderLots()*MarketInfo(Symbol(),MODE_MARGINREQUIRED));   //  take margin as R, the profit R num is: profit/margin
+         if(profitRelRNum>=7){
+            //log_info(distSL+"---7---"+OrderProfit()*Point*0.14/OrderLots()+"---"+OrderProfit()*Point/OrderLots());
+            distSL=MathMin(distSL,OrderProfit()*Point*0.14/OrderLots());
+         }else if(profitRelRNum>=6){
+            //log_info(distSL+"---6---"+OrderProfit()*Point*0.22/OrderLots()+"---"+OrderProfit()*Point/OrderLots());
+            distSL=MathMin(distSL,OrderProfit()*Point*0.22/OrderLots());
+         }else if(profitRelRNum>=5){
+            //log_info(distSL+"---5---"+OrderProfit()*Point*0.3/OrderLots()+"---"+OrderProfit()*Point/OrderLots());
+            distSL=MathMin(distSL,OrderProfit()*Point*0.3/OrderLots());
+         }else if(profitRelRNum>=4){
+            //log_info(distSL+"---4---"+OrderProfit()*Point*0.36/OrderLots()+"---"+OrderProfit()*Point/OrderLots());
+            distSL=MathMin(distSL,OrderProfit()*Point*0.36/OrderLots());
+         }else if(profitRelRNum>=3){
+            //log_info(distSL+"---3---"+OrderProfit()*Point*0.4/OrderLots()+"---"+OrderProfit()*Point/OrderLots());
+            distSL=MathMin(distSL,OrderProfit()*Point*0.4/OrderLots());
          }
          
          if(distSL<minDistSL){
@@ -226,8 +269,7 @@ void modifyStopLoseMAX(double distSL)
 
 void openMAX(double measure)
 {
-   double lotToOpen=lotSpecify;
-   //double lotToOpen=analyseLotToOpen(measure);
+   double lotToOpen=calculatePosition();
  
    if(lotToOpen<=0)
    {
@@ -236,6 +278,7 @@ void openMAX(double measure)
    if(lotToOpen>1)
    {//each time, we'd better trade not greater than 1 lot.
       lotToOpen=1;
+      log_err("The caculated position is greater than 1, set it to 1.");
    }
    log_debug("try to open :"+lotToOpen);
      
@@ -243,17 +286,17 @@ void openMAX(double measure)
    RefreshRates();
    int thisTicket=0;
    double distSLOpen=0;
-   if((3*atrDist)>maxDistSL)
+   if((atrDist)>maxDistSL)
    {
       distSLOpen=maxDistSL;
    }else{
-      distSLOpen=3*atrDist;
+      distSLOpen=atrDist;
    }
-   if((3*atrDist)<minDistSL)
+   if((atrDist)<minDistSL)
    {
       distSLOpen=minDistSL;
    }else{
-      distSLOpen=3*atrDist;
+      distSLOpen=atrDist;
    }
    int retryCount=0;
    while(true)
@@ -267,7 +310,6 @@ void openMAX(double measure)
       log_info("The request was sent to the server. Waiting for reply...");
       if(measure>0)
       {
-
          thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,Ask-distSLOpen,NULL,"",MAGICNUMBER,0,Blue);
       }else if(measure<0)
       {
