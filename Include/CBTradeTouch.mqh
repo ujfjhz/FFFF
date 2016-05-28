@@ -32,7 +32,7 @@ void tradeTouch()
 void openTouch(double measure)
 {
    //double lotToOpen=lotSpecify;
-   double lotToOpen=analyseLotToOpen(measure);
+   double lotToOpen=calculatePosition();
    log_debug("try to open :"+lotToOpen);
    if(lotToOpen<=0)
    {

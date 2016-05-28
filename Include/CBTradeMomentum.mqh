@@ -63,7 +63,7 @@ void openMomentum(int momentum)
 {
    if(momentum!=0)
    {
-      double lotToOpen=analyseLotToOpen(momentum);//借助trend的概念进行分析需要open的手数
+      double lotToOpen=calculatePosition();
 
       if(lotToOpen<=0)
       {
