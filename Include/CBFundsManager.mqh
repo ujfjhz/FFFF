@@ -67,6 +67,7 @@ double calculatePosition()
 
 	double minLot=MarketInfo(Symbol(),MODE_MINLOT);// Min. volume     
 	double step=MarketInfo(Symbol(),MODE_LOTSTEP);//Step to change lots        
+
 	double lotCost=MarketInfo(Symbol(),MODE_MARGINREQUIRED);//Cost per 1 lot    
 	double symbolFreeMargin=getSymbolFreeMargin();
 	
