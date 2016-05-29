@@ -24,22 +24,7 @@ double maxDistSL=3000*Point;
 
 int exemptNumClose=0;//豁免在交叉后强制close的机会数。豁免权在开仓后，maslow与mafast交叉或重合后有机会获取。该属性只属于已有仓位。每bar自动减1。
 int lastUpdownStatus=0;//上一bar的fast与slow MA的相对位置
-double atrDist=0; //基于atr的stop loss distance
-double atrFactor = 3;    //stop loss distance = atr * atrFactor
 
-//calculate standard dev of atr
-double calculateAtrStdDev(int period, double atr)
-{
-   double atrDev = 0;
-   double tmpTR = 0;
-   for(int i=0;i<period;i++)
-   {
-      tmpTR = MathMax(MathMax(MathAbs(High[i]-Low[i]),MathAbs(Close[i+1]-High[i])),MathAbs(Close[i+1]-Low[i]));
-      atrDev=atrDev+(tmpTR-atr)*(tmpTR-atr);
-   }
-   atrDev = atrDev/(period-1);
-   return(MathSqrt(atrDev));
-}
 
 void tradeMAX()
 {

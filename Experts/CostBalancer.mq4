@@ -16,6 +16,8 @@
 #include <CBTradeTrend.mqh>
 #include <CBTradeCutail.mqh>
 #include <CBJinGangJing.mqh>
+#include <CBTradeBreakout.mqh>
+
 
 bool isTickStart=true;//全局控制是否在tick来临时开始自动处理
 extern string stratedy="true";//交易策略。有如下选择：cutail,trend,inertia.默认为cutail收割利润尾巴；trend为按趋势交易；inertia为惯性策略。
@@ -75,6 +77,8 @@ int init()
       MAGICNUMBER=MAGICNUMBER+4;
    }else if(stratedy=="touch"){
       MAGICNUMBER=MAGICNUMBER+5;
+   }else if(stratedy=="breakout"){
+      MAGICNUMBER=MAGICNUMBER+6;
    }
    
    Print("Magic number: "+MAGICNUMBER);
@@ -165,6 +169,8 @@ int start()
       tradeTrend();
    }else if(stratedy=="touch"){
       tradeTouch();
+   }else if(stratedy=="breakout"){
+      tradeBreakout();
    }
    
    //monitor

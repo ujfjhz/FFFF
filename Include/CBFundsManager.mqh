@@ -72,13 +72,13 @@ double calculatePosition()
 	double symbolFreeMargin=getSymbolFreeMargin();
 	
 	//position shouldnot be too sensitive to free margin, thus we passivate it.
-	double quotaFundBase = MathFloor(symbolFreeMargin/1000)*1000;
-	if(symbolFreeMargin>=(quotaFundBase+500)){
+	double quotaFundBase = MathFloor(symbolFreeMargin/500)*500;
+	if(symbolFreeMargin>=(quotaFundBase+250)){
 		quotaFundBase=symbolFreeMargin;
 	}
-	if(quotaFundBase<500)
+	if(quotaFundBase<250)
 	{
-		quotaFundBase=500;
+		quotaFundBase=250;
 	}
 	
 	double quotaFund=quotaFundBase*kellyFormula();
