@@ -15,7 +15,7 @@ int monitor()
 	{
 		string title="[REPORT]Balance:"+AccountBalance()+",Equity:"+AccountEquity();
 		string content="THE OPEN ORDERS :";
-		content=content+"\nOrderSymbol\tOrderLots\tOrderProfit";
+		content=content+"\nSymbol\tPosition\tProfit";
 		
 	    int totalOpen=OrdersTotal();
 	    for(int posOpen=0;posOpen<totalOpen;posOpen++)

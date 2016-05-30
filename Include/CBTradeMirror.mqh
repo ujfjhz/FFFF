@@ -7,28 +7,63 @@
 #property link      ""
 #include <CBTradeCommon.mqh>
 
-/*
-Mirror stratedgy is a generous stratedgy for hedging other stratedgies.
-Mirror should run on 1 minute timeframe chart.
-Mirror should set a fixed postion.
-Mirror shouldnot mirror mirror.
-*/
+extern double mirror_position = 0.02;
+int origTicket = 0; //The mirrored original ticket. 0 indicated nothing was mirrored yet.
+int origType; //The position type of original ticket.
 
-extern string mirrorTarget = ""; //only used when stratedy is set to "mirror"
 void tradeMirror()
 {
-   //check mirror timeframe
-   
-   //check position
-   
-   
+   if(origTicket==0)
+   {
+      //check new opening original ticket
+      int total=OrdersTotal();
+      for(int pos=0;pos<total;pos++)
+      {
+        if(OrderSelect(pos,SELECT_BY_POS)==true)
+        {
+            if(OrderSymbol() !=Symbol() || OrderMagicNumber()!=MAGICNUMBER)// Don't handle other symbols and other timeframes.
+            {
+               continue;
+            }
+            origTicket=OrderTicket();
+            origType = OrderType();
+            break;
+         }else
+        {
+            log_err("orderselect failed :"+GetLastError());
+         }
+      }
+      if(origTicket>0)
+      {
+         //open hedge
+         openMirror();
+      }
+   }else
+   {
+      //check new closed/sl/tp ticket
+      int hstTotal=OrdersHistoryTotal();
+      for(int i=hstTotal-1;i>=0;i--)
+      {
+        if(OrderSelect(i,SELECT_BY_POS,MODE_HISTORY)==false)
+	    {
+			log_err("orderselect failed :"+GetLastError());
+			break;
+	    }
+        if(origTicket==OrderTicket())
+        {
+            //close the mirror position
+            closeMirror();
+            origTicket=0;
+        }
+      }
+   }
 }
 
 
 
 void openMirror()
 {
-   double lotToOpen=calculatePosition();
+   double lotToOpen=mirror_position;
  
    if(lotToOpen<=0)
    {
@@ -44,19 +79,7 @@ void openMirror()
    //交易前先刷新价格
    RefreshRates();
    int thisTicket=0;
-   double distSLOpen=0;
-   if((atrDist)>maxDistSL)
-   {
-      distSLOpen=maxDistSL;
-   }else{
-      distSLOpen=atrDist;
-   }
-   if((atrDist)<minDistSL)
-   {
-      distSLOpen=minDistSL;
-   }else{
-      distSLOpen=atrDist;
-   }
+
    int retryCount=0;
    while(true)
    {
@@ -67,17 +90,16 @@ void openMirror()
          break;
       }
       log_info("The request was sent to the server. Waiting for reply...");
-      if(measure>0)
+      if(origType==OP_BUY)
       {
-         thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,Ask-distSLOpen,NULL,"",MAGICNUMBER,0,Blue);
-      }else if(measure<0)
+         thisTicket=OrderSend(Symbol(),OP_SELL,lotToOpen,Bid,slippage,NULL,NULL,"",MAGICNUMBERMIRROR,0,Red);
+      }else if(origType==OP_SELL)
       {
-         thisTicket=OrderSend(Symbol(),OP_SELL,lotToOpen,Bid,slippage,Bid+distSLOpen,NULL,"",MAGICNUMBER,0,Red);
+         thisTicket=OrderSend(Symbol(),OP_BUY,lotToOpen,Ask,slippage,NULL,NULL,"",MAGICNUMBERMIRROR,0,Blue);
       }
       if(thisTicket>0)
       {
          log_info("Opened order: "+thisTicket);
-         exemptNumClose=0;//开仓后重置豁免权
          break;
       }else{
          int lastError=GetLastError();                 // Failed :(      
@@ -126,4 +148,27 @@ void openMirror()
          break; // break the loop for critical errors
       }
    }
+}
+
+//close all the positions in mirror
+void closeMirror()
+{
+RefreshRates();
+int total=OrdersTotal();
+for(int pos=0;pos<total;pos++)
+ {
+  if(OrderSelect(pos,SELECT_BY_POS)==true)
+  {
+   if(OrderSymbol() !=Symbol() || OrderMagicNumber()!=MAGICNUMBERMIRROR)// Don't handle other symbols and other timeframes.
+   {
+      continue;
+   }
+   
+   closeSelectedTicket();
+
+  }else
+  {
+      log_err("orderselect failed :"+GetLastError());
+  }
+ }
 }
