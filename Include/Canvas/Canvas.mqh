@@ -2590,3 +2590,4 @@ void CCanvas::PolygonFill(CPoint &p[],const uint clr)
    while(il>=ir && ir!=0);
   }
 //+------------------------------------------------------------------+
+
