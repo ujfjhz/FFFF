@@ -307,3 +307,4 @@ bool CWndClient::Rebound(const CRect &rect)
    return(OnResize());
   }
 //+------------------------------------------------------------------+
+
