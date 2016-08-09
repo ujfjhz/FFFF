@@ -365,3 +365,4 @@ bool CCheckGroup::OnChangeItem(const int index)
    return(true);
   }
 //+------------------------------------------------------------------+
+
