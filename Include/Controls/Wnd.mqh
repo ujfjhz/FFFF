@@ -754,3 +754,4 @@ bool CDragWnd::OnDragProcess(const int x,const int y)
   }
 //+------------------------------------------------------------------+
 
+
