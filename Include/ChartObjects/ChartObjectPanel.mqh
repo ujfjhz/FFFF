@@ -196,3 +196,4 @@ bool CChartObjectPanel::CheckState(void)
    return(false);
   }
 //+------------------------------------------------------------------+
+
