@@ -885,3 +885,4 @@ bool CChartObjectRectLabel::Load(const int file_handle)
    return(true);
   }
 //+------------------------------------------------------------------+
+
