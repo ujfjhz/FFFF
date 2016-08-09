@@ -344,3 +344,4 @@ void CPanelDialog::OnChangeCheckGroup(void)
    m_edit.Text(__FUNCTION__+" : Value="+IntegerToString(m_check_group.Value()));
   }
 //+------------------------------------------------------------------+
+
