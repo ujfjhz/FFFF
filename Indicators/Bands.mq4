@@ -136,3 +136,4 @@ double StdDev_Func(int position,const double &price[],const double &MAprice[],in
    return(StdDev_dTmp);
   }
 //+------------------------------------------------------------------+
+
