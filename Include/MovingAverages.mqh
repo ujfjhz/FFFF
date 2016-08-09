@@ -238,3 +238,4 @@ int SmoothedMAOnBuffer(const int rates_total,const int prev_calculated,const int
     return(rates_total);
   }
 //+------------------------------------------------------------------+
+
