@@ -1548,3 +1548,4 @@ bool CChart::Load(const int file_handle)
    return(resutl);
   }
 //+------------------------------------------------------------------+
+
