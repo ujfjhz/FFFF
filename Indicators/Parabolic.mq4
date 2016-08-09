@@ -238,3 +238,4 @@ void SaveLastReverse(int reverse,bool dir,double step,double last_low,double las
   }
 //+------------------------------------------------------------------+
 
+
