@@ -388,3 +388,4 @@ bool CChartObjectGannGrid::Load(const int file_handle)
    return(true);
   }
 //+------------------------------------------------------------------+
+
