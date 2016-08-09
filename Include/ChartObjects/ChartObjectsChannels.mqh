@@ -244,3 +244,4 @@ bool CChartObjectPitchfork::Create(long chart_id,const string name,const int win
    return(true);
   }
 //+------------------------------------------------------------------+
+
