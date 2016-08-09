@@ -117,3 +117,4 @@ string CSeries::PeriodDescription(const int val)
    return(_p_str[i]);
   }
 //+------------------------------------------------------------------+
+
