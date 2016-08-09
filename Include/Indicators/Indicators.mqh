@@ -376,3 +376,4 @@ int CIndicators::TimeframesFlags(const MqlDateTime &time)
   }
 //+------------------------------------------------------------------+
 
+
