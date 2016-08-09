@@ -965,3 +965,4 @@ bool CAppDialog::Save(const int file_handle)
    return(false);
   }
 //+------------------------------------------------------------------+
+
