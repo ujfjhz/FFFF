@@ -470,3 +470,4 @@ bool CWndContainer::Load(const int file_handle)
    return(result);
   }
 //+------------------------------------------------------------------+
+
