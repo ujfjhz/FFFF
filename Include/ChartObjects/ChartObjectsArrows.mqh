@@ -484,3 +484,4 @@ bool CChartObjectArrowRightPrice::Create(long chart_id,const string name,const i
    return(true);
   }
 //+------------------------------------------------------------------+
+
