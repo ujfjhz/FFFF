@@ -188,3 +188,4 @@ void CalculateSmoothedMA(int rates_total,int prev_calculated,const double &price
 //---
   }
 //+------------------------------------------------------------------+
+
