@@ -412,3 +412,4 @@ void CDateDropList::DrawClickRect(const int idx,int x,int y,string text,const ui
   }
 //+------------------------------------------------------------------+
 
+
