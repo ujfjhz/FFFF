@@ -181,3 +181,4 @@ bool CCheckBox::OnClickLabel(void)
    return(OnClickButton());
   }
 //+------------------------------------------------------------------+
+
