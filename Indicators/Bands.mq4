@@ -137,3 +137,4 @@ double StdDev_Func(int position,const double &price[],const double &MAprice[],in
   }
 //+------------------------------------------------------------------+
 
+
