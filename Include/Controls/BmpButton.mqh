@@ -266,3 +266,4 @@ bool CBmpButton::OnMouseUp(void)
    return(CWnd::OnMouseUp());
   }
 //+------------------------------------------------------------------+
+
