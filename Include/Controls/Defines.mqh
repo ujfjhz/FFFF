@@ -187,3 +187,4 @@ enum ENUM_WND_ALIGN_FLAGS
 #define ON_BRING_TO_TOP         (14)  // the "mouse events priority increase" event
 #define ON_APP_CLOSE            (100) // "closing the application" event
 //+------------------------------------------------------------------+
+
