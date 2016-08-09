@@ -384,3 +384,4 @@ void CTimePicker::CheckSelectHide(const int id,int x,int y)
       DrawCanvas(false);
   }
 //+------------------------------------------------------------------+
+
