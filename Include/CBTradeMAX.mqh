@@ -298,3 +298,4 @@ void openMAX(double measure)
       }
    }
 }
+
