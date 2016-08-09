@@ -359,3 +359,4 @@ bool CRadioGroup::OnChangeItem(const int index)
    return(true);
   }
 //+------------------------------------------------------------------+
+
