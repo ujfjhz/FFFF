@@ -281,3 +281,4 @@ string CIndicator::VolumeDescription(const int val) const
    return(str);
   }
 //+------------------------------------------------------------------+
+
