@@ -31,3 +31,4 @@ public:
    virtual int       Compare(const CObject *node,const int mode=0) const { return(0);      }
   };
 //+------------------------------------------------------------------+
+
