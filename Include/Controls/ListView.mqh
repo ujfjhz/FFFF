@@ -542,3 +542,4 @@ bool CListView::OnItemClick(const int index)
    return(true);
   }
 //+------------------------------------------------------------------+
+
