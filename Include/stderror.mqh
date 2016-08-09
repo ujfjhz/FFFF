@@ -149,3 +149,4 @@
 #define ERR_FILE_ARRAYRESIZE_ERROR                 5027   // new MQL4
 #define ERR_FILE_STRINGRESIZE_ERROR                5028   // new MQL4
 #define ERR_FILE_STRUCT_WITH_OBJECTS               5029   // new MQL4
+
