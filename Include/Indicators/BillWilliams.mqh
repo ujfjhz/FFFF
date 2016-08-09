@@ -605,3 +605,4 @@ double CiBWMFI::Main(const int index) const
    return(GetData(0,index));
   }
 //+------------------------------------------------------------------+
+
