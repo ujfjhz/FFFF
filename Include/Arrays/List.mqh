@@ -653,3 +653,4 @@ bool CList::Load(const int file_handle)
    return(result);
   }
 //+------------------------------------------------------------------+
+
