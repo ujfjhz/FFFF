@@ -498,3 +498,4 @@ bool CFileBin::ReadObject(CObject *object)
    return(false);
   }
 //+------------------------------------------------------------------+
+
