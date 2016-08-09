@@ -123,3 +123,4 @@ bool CPicture::OnChange(void)
    return(m_picture.Width(m_border) && m_picture.BmpFileOn(m_bmp_name));
   }
 //+------------------------------------------------------------------+
+
