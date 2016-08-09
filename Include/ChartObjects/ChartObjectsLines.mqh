@@ -333,3 +333,4 @@ bool CChartObjectCycles::Create(long chart_id,const string name,const int window
    return(true);
   }
 //+------------------------------------------------------------------+
+
