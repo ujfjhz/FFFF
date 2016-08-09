@@ -158,3 +158,4 @@ bool CRadioButton::OnClickLabel(void)
    return(OnClickButton());
   }
 //+------------------------------------------------------------------+
+
