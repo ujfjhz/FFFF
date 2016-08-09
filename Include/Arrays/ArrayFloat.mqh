@@ -763,3 +763,4 @@ bool CArrayFloat::Load(const int file_handle)
    return(m_data_total==num);
   }
 //+------------------------------------------------------------------+
+
