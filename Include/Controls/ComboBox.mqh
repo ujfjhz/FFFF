@@ -322,3 +322,4 @@ void CComboBox::CheckListHide(const int id,int x,int y)
      }
   }
 //+------------------------------------------------------------------+
+
