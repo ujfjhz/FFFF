@@ -284,3 +284,4 @@ void CFile::FileFindClose(const long search_handle)
    ::FileFindClose(search_handle);
   }
 //+------------------------------------------------------------------+
+
