@@ -328,3 +328,4 @@ bool CFilePipe::ReadObject(CObject *object)
    return(false);
   }
 //+------------------------------------------------------------------+
+
