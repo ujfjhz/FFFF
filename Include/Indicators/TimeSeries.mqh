@@ -432,3 +432,4 @@ long CiVolume::GetData(const int index) const
    return((long)iVolume(m_symbol,m_period,index));
   }
 //+------------------------------------------------------------------+
+
