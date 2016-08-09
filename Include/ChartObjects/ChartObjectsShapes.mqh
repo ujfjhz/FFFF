@@ -141,3 +141,4 @@ bool CChartObjectEllipse::Create(long chart_id,const string name,const int windo
   }
 //+------------------------------------------------------------------+
 
+
