@@ -156,3 +156,4 @@ Object Plotting Functions:
   PlotText  (objname, delete, window#, time1,  price1,        text,   color, size,  font,  angle, backg, vis);      // Plot text
   PlotLabel (objname, delete, window#, corner, hpos,   vpos,  text,   color, size,  font,  angle, backg, vis);      // Plot text label
 */
+
