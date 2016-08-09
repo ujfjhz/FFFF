@@ -139,3 +139,4 @@ double CiCustom::GetData(const int buffer_num,const int index) const
 //   return(iCustom(m_symbol,m_period,m_ma_period,m_ma_shift,m_ma_method,m_applied,index));
   }
 //+------------------------------------------------------------------+
+
