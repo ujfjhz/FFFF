@@ -144,3 +144,4 @@ bool CButton::OnMouseUp(void)
    return(CWnd::OnMouseUp());
   }
 //+------------------------------------------------------------------+
+
