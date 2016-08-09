@@ -411,3 +411,4 @@ void CDateDropList::DrawClickRect(const int idx,int x,int y,string text,const ui
    m_click_rect[idx].Height(text_h);
   }
 //+------------------------------------------------------------------+
+
