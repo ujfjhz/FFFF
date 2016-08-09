@@ -673,3 +673,4 @@ int CScrollH::CalcPos(const int coord)
    return(new_pos);
   }
 //+------------------------------------------------------------------+
+
