@@ -122,3 +122,4 @@ bool CPanel::OnChange(void)
    return(CWndObj::OnChange() && m_rectangle.BorderType(m_border));
   }
 //+------------------------------------------------------------------+
+
