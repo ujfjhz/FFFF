@@ -91,3 +91,4 @@ bool CLabel::OnMove(void)
    return(m_label.X_Distance(m_rect.left) && m_label.Y_Distance(m_rect.top));
   }
 //+------------------------------------------------------------------+
+
