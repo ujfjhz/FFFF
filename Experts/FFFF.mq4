@@ -1,5 +1,5 @@
 //+------------------------------------------------------------------+
-//|                                                 CostBalancer.mq4 |
+//|                                                 	    FFFF.mq4 |
 //|                                                      ArchestMage |
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -35,7 +35,7 @@ int currentMinute=0;    //current minute
 //+------------------------------------------------------------------+
 int init()
   {
-   log_info("CostBalancer-"+cbVersion+" start running for "+Symbol()+"....");
+   log_info("FFFF-"+cbVersion+" start running for "+Symbol()+"....");
    bless();
    log_info("Lot size in the base currency: "+MarketInfo(Symbol(),MODE_LOTSIZE));
    log_info("Minimum permitted amount of a lot: "+MarketInfo(Symbol(),MODE_MINLOT));

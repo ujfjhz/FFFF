@@ -1,8 +1,0 @@
-2;124;H:\CostBalancer\MT4\experts\include\CBAnalyst.mqh;70:3;'log_info' - function is not defined
-2;124;H:\CostBalancer\MT4\experts\include\CBAnalyst.mqh;95:4;'log_debug' - function is not defined
-2;124;H:\CostBalancer\MT4\experts\include\CBAnalyst.mqh;159:2;'log_debug' - function is not defined
-2;124;H:\CostBalancer\MT4\experts\include\CBAnalyst.mqh;179:19;'getQuota' - function is not defined
-2;124;H:\CostBalancer\MT4\experts\include\CBAnalyst.mqh;181:2;'log_debug' - function is not defined
-2;124;H:\CostBalancer\MT4\experts\include\CBAnalyst.mqh;294:6;'log_err' - function is not defined
-2;93;H:\CostBalancer\MT4\experts\include\CBAnalyst.mqh;324:3;'else' - unexpected token
-2;124;H:\CostBalancer\MT4\experts\include\CBAnalyst.mqh;328:6;'log_err' - function is not defined
