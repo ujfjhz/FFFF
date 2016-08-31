@@ -1,7 +1,7 @@
-CostBalancer
+FFFF
 ============
 
-Free software for financial freedom.
+Free-software For Financial Freedom.
 
 
 ## Committers
