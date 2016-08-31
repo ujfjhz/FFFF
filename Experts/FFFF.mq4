@@ -106,7 +106,7 @@ int init()
 int deinit()
   {
    //TODO: check if there's opening position.
-   log_info("CostBalancer has been stopped.");
+   log_info("FFFF has been stopped.");
    return(0);
   }
 //+------------------------------------------------------------------+
